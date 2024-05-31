@@ -1,4 +1,4 @@
-from db_parser import get_setlist_list
+from database.db_parser import get_setlist_list
 
 db_filename = "DB.JSON"
 

@@ -16,15 +16,15 @@ class Ui_Dialog(object):
         Dialog.setObjectName("Dialog")
         Dialog.resize(200, 128)
         Dialog.setStyleSheet("QPushButton {\n"
-"    border-radius: 5px;\n"
-"    padding: 5px;\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
 "    background-color: rgb(234, 235, 164);\n"
-"    font-size: 12;\n"
+"    font: 12pt;\n"
 "}\n"
 "\n"
 "QLineEdit {\n"
 "    border-radius: 5px;\n"
-"    font-size: 12;\n"
+"    font: 12pt;\n"
 "}")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(Dialog)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
