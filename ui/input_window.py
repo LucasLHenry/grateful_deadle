@@ -14,7 +14,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(200, 128)
+        Dialog.resize(400, 128)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(Dialog.sizePolicy().hasHeightForWidth())
+        Dialog.setSizePolicy(sizePolicy)
+        Dialog.setMinimumSize(QtCore.QSize(300, 128))
         Dialog.setStyleSheet("QPushButton {\n"
 "    border-radius: 10px;\n"
 "    padding: 10px;\n"
@@ -24,7 +30,7 @@ class Ui_Dialog(object):
 "\n"
 "QLineEdit {\n"
 "    border-radius: 5px;\n"
-"    font: 12pt;\n"
+"    font: 10pt;\n"
 "}")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(Dialog)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
@@ -55,6 +61,6 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "—"))
         self.submit_pb.setText(_translate("Dialog", "Submit"))
         self.cancel_pb.setText(_translate("Dialog", "Cancel"))

@@ -1,11 +1,15 @@
 from ui.main_window import Ui_MainWindow
 from input_window_logic import InputWindow
+from lib.classes import Setlist, Song, SubmitWindowInfo, SubmitType
+from lib.database.db_parser import get_setlist_list, get_all_songs
+from CONFIG import ROOT_DIR, DB_FILENAME, SONG_DB_FILENAME
+from functools import partial
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 import sys
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-    def __init__(self, *args, obj=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
         
@@ -20,13 +24,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             [self.row_1_le, self.row_2_le, self.row_3_le]
         ]
         
-        for grid_row in self.grid_buttons:
-            for button in grid_row:
-                button.clicked.connect(self._show_input_window)
+        for row, grid_row in enumerate(self.grid_buttons):
+            for col, button in enumerate(grid_row):
+                button.clicked.connect(partial(self._show_input_window, row, col))
+        
+        self._all_setlists: list[Setlist] = get_setlist_list(DB_FILENAME)
+        self._all_songs: list[Song] = get_all_songs(SONG_DB_FILENAME)
+        self._all_song_names: list[str] = [song.name for song in self._all_songs]
+        self._completer = QtWidgets.QCompleter(self._all_song_names)
     
-    def _show_input_window(self):
+    @QtCore.pyqtSlot(SubmitWindowInfo)
+    def _handle_input_window(self, value: SubmitWindowInfo):
+        print(f"{value.song_name}, {value.pos}")
+        self.setDisabled(False)
+    
+    def _show_input_window(self, row:int, col:int):
         self._iw = InputWindow()
+        self._iw.set_pos(row, col)
+        self._iw.entry_le.setCompleter(self._completer)
+        self._iw.callback.connect(self._handle_input_window)
         self._iw.show()
+        self.setDisabled(True)
 
 
 def main():

@@ -1,4 +1,6 @@
 from datetime import date
+from dataclasses import dataclass
+from enum import Enum, auto
 
 class Song:
     def __init__(self, name: str):
@@ -15,3 +17,13 @@ class Setlist:
         self.venue = venue
         self.date = date
         self.songs: set[Song] = set()
+
+class SubmitType(Enum):
+    SUMBIT = auto()
+    CANCEL = auto()
+
+@dataclass
+class SubmitWindowInfo:
+    song_name: str
+    pos: tuple[int, int]
+    status: SubmitType

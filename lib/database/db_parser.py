@@ -29,3 +29,12 @@ def get_setlist_list(db_filename: str) -> list[Setlist]:
         setlists.append(new_setlist)
     
     return setlists
+
+def get_all_songs(song_db_filename: str) -> list[Song]:
+    with io.open(f"{ROOT_DIR}/lib/database/{song_db_filename.lower()}", mode='r', encoding='utf-8') as f:
+        song_db = json.load(f) 
+    
+    song_list = []
+    for songname in song_db["songs"]:
+        song_list.append(Song(songname["name"]))
+    return song_list
