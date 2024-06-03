@@ -13,6 +13,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
         
+        # put UI elements into array for ease of access
         self.grid_buttons: list[list[QtWidgets.QPushButton]] = [
             [self.r1c1_pb, self.r1c2_pb, self.r1c3_pb],
             [self.r2c1_pb, self.r2c2_pb, self.r2c3_pb],
@@ -24,29 +25,42 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             [self.row_1_le, self.row_2_le, self.row_3_le]
         ]
         
+        # connect input window popup signals
         for row, grid_row in enumerate(self.grid_buttons):
             for col, button in enumerate(grid_row):
                 button.clicked.connect(partial(self._show_input_window, row, col))
         
+        # get data from db
         self._all_setlists: list[Setlist] = get_setlist_list(DB_FILENAME)
         self._all_songs: list[Song] = get_all_songs(SONG_DB_FILENAME)
         self._all_song_names: list[str] = [song.name for song in self._all_songs]
+        
+        # set up autocompleter
         self._completer = QtWidgets.QCompleter(self._all_song_names)
+        self._completer.setCaseSensitivity(False)
     
+    # gets info from input window on what song was selected
     @QtCore.pyqtSlot(SubmitWindowInfo)
     def _handle_input_window(self, value: SubmitWindowInfo):
-        print(f"{value.song_name}, {value.pos}")
         self.setDisabled(False)
+        
+        # ignore cancelled inputs
+        if value.status == SubmitType.CANCEL:
+            return
     
     def _show_input_window(self, row:int, col:int):
         self._iw = InputWindow()
-        self._iw.set_pos(row, col)
-        self._iw.entry_le.setCompleter(self._completer)
+        self._iw.set_pos(row, col) # window needs to know which cell it corresponds to
+        self._iw.entry_le.setCompleter(self._completer) # autocomplete
         self._iw.callback.connect(self._handle_input_window)
         self._iw.show()
+        
+        # disable main window while the popup window is
         self.setDisabled(True)
 
 
+
+# runner and include guard
 def main():
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()

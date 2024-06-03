@@ -26,3 +26,6 @@ class InputWindow(QtWidgets.QDialog, Ui_Dialog):
         output = SubmitWindowInfo(self.entry_le.text(), self._pos, SubmitType.CANCEL)
         self.callback.emit(output)
         self.close()
+        
+    def closeEvent(self, event):
+        self._cancel_clicked()  # to make sure we send the callback

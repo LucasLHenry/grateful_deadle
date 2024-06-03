@@ -18,6 +18,11 @@ class Setlist:
         self.date = date
         self.songs: set[Song] = set()
 
+
+# these two classes (SubmitType and SubmitWindowInfo) are passed
+# between the main window and the input window to provide info
+# on what song was selected
+
 class SubmitType(Enum):
     SUMBIT = auto()
     CANCEL = auto()
