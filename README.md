@@ -1,4 +1,13 @@
 # THE GREATFUL DEADLE
+## Gameplay
 A simple trivia game for deadheads. It consists of a 3x3 grid of squares, as well as dates
 along the upper and left sides. The goal is to fill in each square with a song that was played
 by the grateful dead at their shows on both of those dates.
+
+Clicking on a box opens up a window where you can input the name of a song, with autocomplete to
+help you out.
+
+## Technical Info
+This game was written in python, using qtpy to generate the ui. The UI was first laid out using 
+qtDesigner, then the python equivalent files were generated using 
+    generate_song_list.py
