@@ -9,5 +9,7 @@ help you out.
 
 ## Technical Info
 This game was written in python, using qtpy to generate the ui. The UI was first laid out using 
-qtDesigner, then the python equivalent files were generated using 
-    generate_song_list.py
+qtDesigner, then the python equivalent files were generated using `regenerate_ui_files.sh`.
+
+The program uses a json database to source all of its information, located in `lib/database/db.json`.
+The `allsongs.json` file was generated from this file using `generate_song_list.py`.
