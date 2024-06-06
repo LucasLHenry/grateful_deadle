@@ -2,7 +2,6 @@ from ui.main_window import Ui_MainWindow
 from input_window_logic import InputWindow
 from lib.classes import Setlist, Song, SubmitWindowInfo, SubmitType
 from lib.database.db_parser import get_setlist_list, get_all_songs
-from CONFIG import ROOT_DIR, DB_FILENAME, SONG_DB_FILENAME
 from functools import partial
 
 from PyQt5 import QtWidgets, QtCore
@@ -31,8 +30,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 button.clicked.connect(partial(self._show_input_window, row, col))
         
         # get data from db
-        self._all_setlists: list[Setlist] = get_setlist_list(DB_FILENAME)
-        self._all_songs: list[Song] = get_all_songs(SONG_DB_FILENAME)
+        self._all_setlists: list[Setlist] = get_setlist_list()
+        self._all_songs: list[Song] = get_all_songs()
         self._all_song_names: list[str] = [song.name for song in self._all_songs]
         
         # set up autocompleter
