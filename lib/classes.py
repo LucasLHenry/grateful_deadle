@@ -1,6 +1,7 @@
 from datetime import date
 from dataclasses import dataclass
 from enum import Enum, auto
+from typing import Optional
 
 class Song:
     def __init__(self, name: str):
@@ -17,6 +18,14 @@ class Setlist:
         self.venue = venue
         self.date = date
         self.songs: set[Song] = set()
+        self._songnames: list[str] = []
+        
+    @property
+    def songnames(self):
+        if len(self.songs) != len(self._songnames):
+            self._songnames = [song.name for song in self.songs]
+        return self._songnames
+            
 
 
 # these two classes (SubmitType and SubmitWindowInfo) are passed
@@ -32,3 +41,8 @@ class SubmitWindowInfo:
     song_name: str
     pos: tuple[int, int]
     status: SubmitType
+    
+@dataclass
+class Game:
+    songs: list[list[Optional[Song]]]  # 3x3 (the grid (list of rows))
+    dates: list[list[Optional[date]]]  # 2x3 (the edges (left then top))

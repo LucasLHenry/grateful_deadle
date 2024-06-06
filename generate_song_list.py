@@ -1,5 +1,5 @@
 from lib.database.db_parser import get_setlist_list
-from lib.classes import Setlist, Song
+from lib.classes import Setlist
 from CONFIG import DB_FILENAME, SONG_DB_FILENAME, ROOT_DIR
 import json
 
