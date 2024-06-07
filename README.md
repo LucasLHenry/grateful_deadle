@@ -14,5 +14,5 @@ help you out.
 This game was written in python, using qtpy to generate the ui. The UI was first laid out using 
 qtDesigner, then the python equivalent files were generated using `regenerate_ui_files.sh`.
 
-The program uses a json database to source all of its information, located in `lib/database/db.json`.
+The program uses a json database to source all of its information, located in `lib/database/db.json`. This database was copied from MichaelAdamBerry's [darkstar-project](https://github.com/MichaelAdamBerry/darkstar-project).
 The `allsongs.json` file was generated from this file using `generate_song_list.py`.
