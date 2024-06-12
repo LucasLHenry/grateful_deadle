@@ -2,7 +2,16 @@ from datetime import date
 import io, json
 from lib.classes import Song, Setlist
 from typing import Iterator
-from CONFIG import ROOT_DIR, DB_FILENAME, SONG_DB_FILENAME
+from CONFIG import ROOT_DIR, DB_FILENAME, SONG_DB_FILENAME, RV_DB_FILENAME
+
+def get_reverse_db():
+    with open(f"{ROOT_DIR}/lib/database/{RV_DB_FILENAME.lower()}", 'r') as f:
+        reverse_db: dict = json.load(f)
+        
+    for songname, datelist in reverse_db.items():
+        reverse_db[songname] = set([parse_date_str(date_str) for date_str in datelist])
+        
+    return reverse_db
 
 def parse_date_str(date_str: str) -> date:
     day, month, year = tuple([int(el) for el in date_str.split('-')])

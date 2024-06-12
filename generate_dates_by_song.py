@@ -10,10 +10,11 @@ def main():
     setlists = get_setlist_list()
     songs = get_all_songs()
     out_dict = dict()
-    out_dict["songs"] = [{"name": song.name, "dates":[]} for song in songs]
+    for song in songs:
+        out_dict[song.name] = []
     for setlist in setlists:
         for songname in setlist.songnames:
-            [song["dates"] for song in out_dict["songs"] if song["name"] == songname][0].append(setlist.date.strftime("%d-%m-%Y"))
+            out_dict[songname].append(setlist.date.strftime("%d-%m-%Y"))
 
     with open(f"{ROOT_DIR}/lib/database/{RV_DB_FILENAME.lower()}", 'w') as f:
         f.write(json.dumps(out_dict, indent=4))

@@ -46,3 +46,7 @@ class SubmitWindowInfo:
 class Game:
     songs: list[list[Optional[Song]]]  # 3x3 (the grid (list of rows))
     dates: list[list[Optional[date]]]  # 2x3 (the edges (left then top))
+    
+    def init():
+        songs = [[None]*3, [None]*3, [None]*3]
+        dates = [[None]*3, [None]*3]
