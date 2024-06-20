@@ -9,10 +9,14 @@ def setlist_list_to_fwd_db(setlists: list[Setlist]) -> dict[date, set[str]]:
         out_dict[setlist.date] = set(setlist.songnames)
     return out_dict        
 
+from random import shuffle
+
 def generate_games():
     setlists: list[Setlist] = get_setlist_list()
     db: dict[date, set[str]] = setlist_list_to_fwd_db(setlists)
-    all_dates: list[date] = db.keys()
+    all_dates: list[date] = list(db.keys())
+    shuffle(all_dates)
+    
     game = Game()
     return recursive_search(game, 0, all_dates, db)
     
@@ -44,7 +48,9 @@ def recursive_search(
     else:  # it's a song
         # because of order, songs always have both relevant dates already assigned
         # use set intersection to make search space smaller
-        for song in (db[game.dates[0][y]] & db[game.dates[1][x]]):
+        possible_songs = list(db[game.dates[0][y]] & db[game.dates[1][x]])
+        shuffle(possible_songs)
+        for song in possible_songs:
             if song not in (game.songs[0] + game.songs[1] + game.songs[2]):  # must be unique
                 game.songs[x][y] = song  # assign
                 soln = recursive_search(game, depth+1, all_dates, db)  # test assignment
