@@ -5,12 +5,11 @@ import json
 import profile
 
 def main():
-    games = g.generate_games()
+    games = g.generate_game()
     print("\n")
     print(games)
-    # json_output = json.dumps({"games": games}, indent=4)
-    # with open(f"{ROOT_DIR}/lib/database/{GAMES_DB_FILENAME.lower()}", 'w') as f:
-    #     f.write(json_output)
+    with open(f"{ROOT_DIR}/lib/database/{GAMES_DB_FILENAME.lower()}", 'w') as f:
+        g.generate_games(f)
     
 if __name__ == "__main__":
     main()
