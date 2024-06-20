@@ -42,11 +42,20 @@ class SubmitWindowInfo:
     pos: tuple[int, int]
     status: SubmitType
     
-@dataclass
 class Game:
-    songs: list[list[Optional[Song]]]  # 3x3 (the grid (list of rows))
-    dates: list[list[Optional[date]]]  # 2x3 (the edges (left then top))
+    def __init__(self):
+        self.songs = [[None]*3, [None]*3, [None]*3]
+        self.dates = [[None]*3, [None]*3]
     
-    def init():
-        songs = [[None]*3, [None]*3, [None]*3]
-        dates = [[None]*3, [None]*3]
+    def __repr__(self):
+        def truncate_str(s: str, max_len: int):
+            if len(s) > max_len:
+                return s[:max_len - 1] + "..."
+            return s
+        
+        return (
+            f"{'': <15}{str(self.dates[0][0]): ^25}{str(self.dates[0][1]): ^25}{str(self.dates[0][2]): >25} \n"
+            f"{str(self.dates[1][0]): <15}{truncate_str(self.songs[0][0], 20): ^25}{truncate_str(self.songs[0][1], 20): ^25}{truncate_str(self.songs[0][2], 20): >25} \n"
+            f"{str(self.dates[1][1]): <15}{truncate_str(self.songs[1][0], 20): ^25}{truncate_str(self.songs[1][1], 20): ^25}{truncate_str(self.songs[1][2], 20): >25} \n"
+            f"{str(self.dates[1][2]): <15}{truncate_str(self.songs[2][0], 20): ^25}{truncate_str(self.songs[2][1], 20): ^25}{truncate_str(self.songs[2][2], 20): >25} \n"
+        )
