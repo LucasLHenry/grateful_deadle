@@ -5,7 +5,7 @@ import json
 import profile
 
 def main():
-    games = g.generate_games_raw()
+    games = g.generate_games()
     print("\n")
     print(games)
     # json_output = json.dumps({"games": games}, indent=4)

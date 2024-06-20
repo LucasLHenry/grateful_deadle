@@ -20,8 +20,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         ]
         
         self.grid_displays: list[list[QtWidgets.QLineEdit]] = [
-            [self.col_1_le, self.col_2_le, self.col_3_le],
-            [self.row_1_le, self.row_2_le, self.row_3_le]
+            [self.row_1_le, self.row_2_le, self.row_3_le],
+            [self.col_1_le, self.col_2_le, self.col_3_le]
         ]
         
         # connect input window popup signals
