@@ -5,6 +5,7 @@ from lib.database.db_parser import get_setlist_list, get_all_songs
 from lib.game_algorithm import generate_game
 from functools import partial
 import stylesheets as ss
+import textwrap
 
 from PyQt5 import QtWidgets, QtCore
 import sys
@@ -40,6 +41,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self._completer = QtWidgets.QCompleter(self._all_song_names)
         self._completer.setCaseSensitivity(False)
         
+        #set up text wrapper
+        self._wr = textwrap.TextWrapper(width=15)
+        
         self._game = generate_game()
         print(self._game)
         self._display_constraints()
@@ -61,7 +65,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.grid_buttons[x][y].setStyleSheet(ss.button_ss_default)
             return
         
-        self.grid_buttons[x][y].setText(value.song_name)
+        self.grid_buttons[x][y].setText(str(self.wrap(value.song_name)))
         if value.song_name == self._game.songs[x][y]:
             self.grid_buttons[x][y].setStyleSheet(ss.button_ss_correct)
         else:
@@ -86,6 +90,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for button_list in self.grid_buttons:
             for button in button_list:
                 button.setStyleSheet(ss.button_ss_default)
+                
+    def wrap(self, s: str):
+        wrap_list = self._wr.wrap(s)
+        return '\n'.join(wrap_list)
 
 
 
