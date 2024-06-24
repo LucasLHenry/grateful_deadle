@@ -273,6 +273,14 @@ QLineEdit {
           <height>120</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Variable Display Light</family>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: &quot;Segoe UI Variable Display Light&quot;</string>
+        </property>
         <property name="text">
          <string>—</string>
         </property>
