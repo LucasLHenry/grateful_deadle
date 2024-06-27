@@ -18,7 +18,7 @@ def generate_game():
     shuffle(all_dates)
     
     game = Game()
-    return recursive_search(game, 0, all_dates, db, True, None)
+    return recursive_search_dates_and_songs(game, 0, all_dates, db, True, None)
 
 def generate_games(fp):
     setlists: list[Setlist] = get_setlist_list()
@@ -27,10 +27,10 @@ def generate_games(fp):
     shuffle(all_dates)
     
     game = Game()
-    return recursive_search(game, 0, all_dates, db, False, fp)
+    return recursive_search_dates_and_songs(game, 0, all_dates, db, False, fp)
     
 
-def recursive_search(
+def recursive_search_dates_and_songs(
         game: Game, 
         depth: int, 
         all_dates: list[date], 
@@ -72,3 +72,28 @@ def recursive_search(
                 else: 
                     game.songs[x][y] = None  # bad soln, undo assignment
         return None  # no solutions, backtrack
+    
+    
+def recursive_search(
+        game: Game, 
+        depth: int, 
+        all_dates: list[date], 
+        db: dict[date, set[str]],
+    ) -> Optional[Game]:
+    
+    if depth == 6:  # max depth (all assignments)
+        return game
+    
+    # this variable is a constant that dictates the order in which variable assignments are done
+    variable_indices_in_assignment_order = [(0,0), (1,0), (0,1), (1,1), (0,2), (1,2)]
+    
+    x, y = variable_indices_in_assignment_order[depth]  # indices of variable to assign
+    for date in all_dates:  # because of the search order, dates are never constrained
+        if date in (game.dates[0] + game.dates[1]): continue # must be a new date
+        if x == 1 and len(list(db[date] & db[game.dates[0][y]])) == 0: continue
+        
+        game.dates[x][y] = date  # assign
+        soln = recursive_search(game, depth+1, all_dates, db)  # test assignment
+        if soln is not None: return soln  # good soln, pass back up chain
+        else: game.dates[x][y] = None  # bad soln, undo assignment
+    return None  # no solutions, backtrack

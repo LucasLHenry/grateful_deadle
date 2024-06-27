@@ -92,8 +92,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 button.setStyleSheet(ss.button_ss_default)
                 
     def wrap(self, s: str):
-        wrap_list = self._wr.wrap(s)
-        return '\n'.join(wrap_list)
+        return '\n'.join(self._wr.wrap(s))
 
 
 
