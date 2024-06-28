@@ -1,8 +1,5 @@
 import lib.game_algorithm as g
-from lib.database.db_parser import get_setlist_list, get_all_songs
 from CONFIG import GAMES_DB_FILENAME, ROOT_DIR
-import json
-import profile
 
 def main():
     games = g.generate_game()

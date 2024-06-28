@@ -52,7 +52,7 @@ def recursive_search_dates_and_songs(
         for date in all_dates:  # because of the search order, dates are never constrained
             if date not in (game.dates[0] + game.dates[1]):  # must be a new date
                 game.dates[x][y] = date  # assign
-                soln = recursive_search(game, depth+1, all_dates, db, first_soln, fp)  # test assignment
+                soln = recursive_search_dates_and_songs(game, depth+1, all_dates, db, first_soln, fp)  # test assignment
                 if soln is not None and first_soln: 
                     return soln  # good soln, pass back up chain
                 else: 
@@ -66,7 +66,7 @@ def recursive_search_dates_and_songs(
         for song in possible_songs:
             if song not in (game.songs[0] + game.songs[1] + game.songs[2]):  # must be unique
                 game.songs[x][y] = song  # assign
-                soln = recursive_search(game, depth+1, all_dates, db, first_soln, fp)  # test assignment
+                soln = recursive_search_dates_and_songs(game, depth+1, all_dates, db, first_soln, fp)  # test assignment
                 if soln is not None: 
                     return soln  # good soln, return
                 else: 

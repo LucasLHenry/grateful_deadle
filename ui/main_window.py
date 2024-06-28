@@ -147,6 +147,10 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.r1c1_pb.sizePolicy().hasHeightForWidth())
         self.r1c1_pb.setSizePolicy(sizePolicy)
         self.r1c1_pb.setMinimumSize(QtCore.QSize(120, 120))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Variable Display Light")
+        self.r1c1_pb.setFont(font)
+        self.r1c1_pb.setStyleSheet("font: \"Segoe UI Variable Display Light\"")
         self.r1c1_pb.setObjectName("r1c1_pb")
         self.gridLayout.addWidget(self.r1c1_pb, 1, 1, 1, 1)
         self.r3c1_pb = QtWidgets.QPushButton(self.centralwidget)
@@ -183,7 +187,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "The Grateful Deadle"))
-        self.title_label.setText(_translate("MainWindow", "The Grateful Deadle"))
+        self.title_label.setText(_translate("MainWindow", "The Grateful Grid"))
         self.r2c1_pb.setText(_translate("MainWindow", "—"))
         self.r2c3_pb.setText(_translate("MainWindow", "—"))
         self.r1c3_pb.setText(_translate("MainWindow", "—"))

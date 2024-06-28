@@ -51,7 +51,7 @@ QLineEdit {
        </font>
       </property>
       <property name="text">
-       <string>The Grateful Deadle</string>
+       <string>The Grateful Grid</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
