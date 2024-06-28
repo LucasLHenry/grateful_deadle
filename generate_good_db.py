@@ -1,14 +1,7 @@
 from CONFIG import RAW_DB_FILENAME, DB_FILENAME, ROOT_DIR
 import json, io
 from datetime import date
-import hashlib as h
-
-def gen_hash(s: str, len: int) -> str:
-    return h.sha256(s.encode('utf-8')).hexdigest()[:len]
-
-def parse_date_str(date_str: str) -> date:
-    day, month, year = tuple([int(el) for el in date_str.split('-')])
-    return date(year, month, day)
+from utils import gen_hash, parse_date_str
 
 def main():
     with io.open(f"{ROOT_DIR}/lib/database/{RAW_DB_FILENAME.lower()}", mode='r', encoding='utf-8') as f:
