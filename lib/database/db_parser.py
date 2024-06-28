@@ -2,7 +2,7 @@ from datetime import date
 import io, json
 from lib.classes import Song, Setlist
 from typing import Iterator
-from CONFIG import ROOT_DIR, DB_FILENAME, SONG_DB_FILENAME, RV_DB_FILENAME
+from CONFIG import ROOT_DIR, RAW_DB_FILENAME, SONG_DB_FILENAME, RV_DB_FILENAME
 
 def get_reverse_db():
     with open(f"{ROOT_DIR}/lib/database/{RV_DB_FILENAME.lower()}", 'r') as f:
@@ -22,14 +22,15 @@ def yield_songs_from_setlist_dict(setlist_dict: dict) -> Iterator[Song]:
         for song in setlist["song"]:
             yield Song(song["name"])
 
-def get_setlist_list(db_filename: str = DB_FILENAME) -> list[Setlist]:
+def get_setlist_list(db_filename: str = RAW_DB_FILENAME) -> list[Setlist]:
     with io.open(f"{ROOT_DIR}/lib/database/{db_filename.lower()}", mode='r', encoding='utf-8') as f:
         db = json.load(f)
     
     setlists = []
     for setlist_dict in db["setlists"]:
-        venue = setlist_dict["venue"]["name"]
         new_date = parse_date_str(setlist_dict["eventDate"])
+        if new_date.year > 1995: continue  # only consider "true Dead"
+        venue = setlist_dict["venue"]["name"]
         new_setlist = Setlist(venue, new_date)
         
         for song in yield_songs_from_setlist_dict(setlist_dict):

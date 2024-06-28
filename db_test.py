@@ -1,6 +1,6 @@
 from lib.database.db_parser import get_setlist_list
 
-db_filename = "DB.JSON"
+db_filename = "RAW_DB.JSON"
 
 def main():
     setlists = get_setlist_list(db_filename)

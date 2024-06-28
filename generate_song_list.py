@@ -1,10 +1,10 @@
 from lib.database.db_parser import get_setlist_list
 from lib.classes import Setlist
-from CONFIG import DB_FILENAME, SONG_DB_FILENAME, ROOT_DIR
+from CONFIG import RAW_DB_FILENAME, SONG_DB_FILENAME, ROOT_DIR
 import json
 
 def main():
-    all_setlists: list[Setlist] = get_setlist_list(DB_FILENAME)
+    all_setlists: list[Setlist] = get_setlist_list(RAW_DB_FILENAME)
     all_song_names: set[str] = set()
     for setlist in all_setlists:
         for song in setlist.songs:
