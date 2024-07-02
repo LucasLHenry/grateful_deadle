@@ -2,7 +2,7 @@ from ui.input_window import Ui_Dialog
 from lib.classes import SubmitWindowInfo, SubmitType
 
 from PyQt5 import QtWidgets, QtCore
-import sys
+from typing import Optional
 
 class InputWindow(QtWidgets.QDialog, Ui_Dialog):
     callback = QtCore.pyqtSignal(SubmitWindowInfo)
@@ -12,7 +12,6 @@ class InputWindow(QtWidgets.QDialog, Ui_Dialog):
         self.setupUi(self)
         self.submit_pb.clicked.connect(self._submit_clicked)
         self.cancel_pb.clicked.connect(self._cancel_clicked)
-
     
     def set_pos(self, row: int, col: int):
         self._pos = (row, col)
