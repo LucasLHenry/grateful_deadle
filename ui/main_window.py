@@ -22,7 +22,9 @@ class Ui_MainWindow(object):
 "\n"
 "QTextEdit {\n"
 "    border-radius: 10px;\n"
-"    font: 12pt \"Segoe UI Variable Display\";\n"
+"    font: 10pt \"Segoe UI Variable Display\";\n"
+"    \n"
+"    background-color: rgb(255, 255, 255);\n"
 "}")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -97,8 +99,6 @@ class Ui_MainWindow(object):
         self.r3c3_pb.setMinimumSize(QtCore.QSize(120, 120))
         self.r3c3_pb.setObjectName("r3c3_pb")
         self.gridLayout.addWidget(self.r3c3_pb, 3, 3, 1, 1)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout.addItem(spacerItem, 0, 0, 1, 1)
         self.r2c2_pb = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
@@ -158,6 +158,14 @@ class Ui_MainWindow(object):
         self.row_3_te = QtWidgets.QTextEdit(self.centralwidget)
         self.row_3_te.setObjectName("row_3_te")
         self.gridLayout.addWidget(self.row_3_te, 3, 0, 1, 1)
+        self.restart_pb = QtWidgets.QPushButton(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.restart_pb.sizePolicy().hasHeightForWidth())
+        self.restart_pb.setSizePolicy(sizePolicy)
+        self.restart_pb.setObjectName("restart_pb")
+        self.gridLayout.addWidget(self.restart_pb, 0, 0, 1, 1)
         self.verticalLayout_2.addLayout(self.gridLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -173,7 +181,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "The Grateful Deadle"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "The Grateful Grid"))
         self.title_label.setText(_translate("MainWindow", "The Grateful Grid"))
         self.r2c1_pb.setText(_translate("MainWindow", "—"))
         self.r2c3_pb.setText(_translate("MainWindow", "—"))
@@ -184,3 +192,4 @@ class Ui_MainWindow(object):
         self.r1c1_pb.setText(_translate("MainWindow", "—"))
         self.r3c1_pb.setText(_translate("MainWindow", "—"))
         self.r1c2_pb.setText(_translate("MainWindow", "—"))
+        self.restart_pb.setText(_translate("MainWindow", "Restart"))

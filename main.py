@@ -31,6 +31,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for row, grid_row in enumerate(self.grid_buttons):
             for col, button in enumerate(grid_row):
                 button.clicked.connect(partial(self._show_input_window, row, col))
+        self.restart_pb.clicked.connect(self._restart_game)
         
         # get data from db
         self._db = get_db()
@@ -45,12 +46,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self._game.print_all_info(self._db)
         self._display_constraints()
         
-        self._set_styles()
+        self._set_styles_to_default()
     
     # gets info from input window on what song was selected
     @QtCore.pyqtSlot(SubmitWindowInfo)
     def _handle_input_window(self, value: SubmitWindowInfo):
-        self.setDisabled(False)  
+        self.setDisabled(False)  # re-enable main window
         
         # ignore cancelled inputs
         if value.status == SubmitType.CANCEL:
@@ -75,8 +76,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self._iw.entry_le.setCompleter(self._completer) # autocomplete
         self._iw.callback.connect(self._handle_input_window)
         self._iw.show()
-        
-        # disable main window while the popup window is
+        # disable main window while the popup window is open
         self.setDisabled(True)
     
     def _display_constraints(self):
@@ -85,15 +85,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for side_display, side_constraint in zip(self.grid_displays[1], self._game.side_constraints):
             side_display.setText(str(side_constraint))
                 
-    def _set_styles(self):
+    def _set_styles_to_default(self):
         for button_list in self.grid_buttons:
             for button in button_list:
                 button.setStyleSheet(ss.button_ss_default)
+                button.setText("—")
         
         for display_list in self.grid_displays:
             for display in display_list:
                 display.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-
+                display.setStyleSheet(ss.display_ss)
+        
+        self.restart_pb.setStyleSheet(ss.restart_button_ss)
+    
+    def _restart_game(self):
+        self._game = generate_game()
+        self._display_constraints()
+        self._set_styles_to_default()
 
 
 # runner and include guard
