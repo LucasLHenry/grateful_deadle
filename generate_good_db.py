@@ -51,6 +51,7 @@ def main():
     # {
     #     "sets": {
     #         "dd-mm-yyyy": {
+    #             "date": "dd-mm-yyyy",
     #             "venue_id": "xxxxxxx",
     #             "tour": "",
     #             "songs": [
@@ -80,7 +81,7 @@ def main():
         date_str: str = setlist["eventDate"]
         show_date: date = parse_date_str(date_str)
         if show_date.year > 1995: continue
-        set_dict = dict()
+        set_dict = {"date": date_str}
         
         venue: str = setlist["venue"]["name"]
         city: str = setlist["venue"]["city"]["name"]
