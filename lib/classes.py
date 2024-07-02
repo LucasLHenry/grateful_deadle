@@ -2,7 +2,7 @@ from datetime import date
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional, Union
-from utils import truncate_str, gen_hash
+from utils import truncate_str, gen_hash, parse_date_str
 
 
 class Song:
@@ -52,18 +52,17 @@ class ConstraintType(Enum):
     PLAYED_AT = auto()
 
 class Constraint:
-    def __init__(self, c_type: ConstraintType, value: Union[date]):
+    def __init__(self, c_type: ConstraintType, value: str):
         self.constraint_type = c_type
         self.songs: set[str] = set()  # list of song hashes
-        self.value: Union[date] = value  # changes in meaning depending on constraint type
+        self.value: str = value  # changes in meaning depending on constraint type
         self.id = Constraint.gen_constraint_hash(c_type.value, value)
     
-    @property
-    def text(self) -> str:
+    def __str__(self) -> str:
         match self.constraint_type:
             case ConstraintType.DATE:
                 # id is the tour date
-                return f"Played on {self.value.strftime("%b %d, %Y")}"
+                return f"Played on {parse_date_str(self.value).strftime("%b %d, %Y")}"
             case ConstraintType.DEBUT:
                 raise ValueError("debut not implemented")
             case ConstraintType.TOUR:
@@ -98,7 +97,7 @@ class TightGame:
         self.songs = [[None]*3, [None]*3, [None]*3]
         self.dates = [[None]*3, [None]*3]
     
-    def __repr__(self):
+    def __str__(self):
         return (
             f"{'': <15}{str(self.dates[0][0]): ^25}{str(self.dates[0][1]): ^25}{str(self.dates[0][2]): >25} \n"
             f"{str(self.dates[1][0]): <15}{truncate_str(self.songs[0][0], 20): ^25}{truncate_str(self.songs[0][1], 20): ^25}{truncate_str(self.songs[0][2], 20): >25} \n"
@@ -108,12 +107,37 @@ class TightGame:
 
 class Game:
     def __init__(self):
-        # self.constraint_ids: list[list[Optional[str]]] = [[None]*3, [None]*3]
+        self.top_constraints: list[Optional[Constraint]] = [None] * 3
+        self.side_constraints: list[Optional[Constraint]] = [None] * 3
         self.constraints: list[list[Optional[Constraint]]] = [[None]*3, [None]*3]
     
     @property
     def ids(self) -> list[str]:
-        return [c.id for c in (self.constraints[0] + self.constraints[1])]
+        # return [c.id for c in (self.constraints[0] + self.constraints[1]) if c is not None]
+        return [c.id for c in (self.top_constraints + self.side_constraints) if c is not None]
+    
+    def possibilities_at(self, x: int, y: int) -> set[str]:
+        c1 = self.top_constraints[x].songs if self.top_constraints[x] is not None else set()
+        c2 = self.side_constraints[y].songs if self.side_constraints[y] is not None else set()
+        if len(c1) == 0 and len(c2) == 0:
+            return set(str(range(999)))
+        elif len(c1) == 0: return c2
+        elif len(c2) == 0: return c1
+        return c1 & c2
+    
+    def is_valid(self) -> bool:
+        for i in range(3):
+            for j in range(3):
+                if len(self.possibilities_at(i, j)) == 0: return False
+        return True
+                
+    def __str__(self) -> str:
+        return (
+            f"{'': <15}{str(self.top_constraints[0]): ^25}{str(self.top_constraints[1]): ^25}{str(self.top_constraints[2]): >25} \n"
+            f"{str(self.side_constraints[0]): <15}{len(self.possibilities_at(0, 0)): ^25}{len(self.possibilities_at(1, 0)): ^25}{len(self.possibilities_at(2, 0)): >25} \n"
+            f"{str(self.side_constraints[1]): <15}{len(self.possibilities_at(0, 1)): ^25}{len(self.possibilities_at(1, 1)): ^25}{len(self.possibilities_at(2, 1)): >25} \n"
+            f"{str(self.side_constraints[2]): <15}{len(self.possibilities_at(0, 2)): ^25}{len(self.possibilities_at(1, 2)): ^25}{len(self.possibilities_at(2, 2)): >25} \n"
+        )
     # def load(self, constraint_db):
     #     # populates constraints from ids
     #     for i, row_or_col in enumerate(self.constraint_ids):

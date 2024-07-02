@@ -13,9 +13,7 @@ from random import shuffle
 
 def main():
     game = generate_game()
-    for row_or_col in game.constraints:
-        for c in row_or_col:
-            print(c.text())
+    print(game)
 
 def generate_game():
     all_constraints = load_constraints()
@@ -96,18 +94,26 @@ def recursive_search(
     if depth == 6:  # max depth (all assignments)
         return game
     
+    if not game.is_valid():  # this is where the constraints are checked
+        return None
+    
     # this variable is a constant that dictates the order in which variable assignments are done
     variable_indices_in_assignment_order = [(0,0), (1,0), (0,1), (1,1), (0,2), (1,2)]
     
-    x, y = variable_indices_in_assignment_order[depth]  # indices of variable to assign
+    # ts = 0 -> top row, ts = 1 -> side column
+    ts, pos = variable_indices_in_assignment_order[depth]  # indices of variable to assign
     for c in all_constraints:  # because of the search order, dates are never constrained
         if c.id in game.ids: continue # must be a new constraint
-        if x == 1 and len(list(c.songs & game.constraints[0][y].songs)) == 0: continue
         
-        game.constraints[x][y] = c  # assign
+        if ts == 0: game.top_constraints[pos] = c  # assign
+        else: game.side_constraints[pos] = c
+        
         soln = recursive_search(game, depth+1, all_constraints)  # test assignment
+        
         if soln is not None: return soln  # good soln, pass back up chain
-        else: game.constraints[x][y] = None  # bad soln, undo assignment
+        else: # bad soln, undo assignment
+            if ts == 0: game.top_constraints[pos] = None  # assign
+            else: game.side_constraints[pos] = None
     return None  # no solutions, backtrack
 
 
