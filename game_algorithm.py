@@ -2,6 +2,7 @@ from lib.classes import Constraint, Game
 from typing import Optional
 from constraints import load_constraints  
 from lib.database.db_utils import get_db
+from utils import weighted_shuffle
 
 from random import shuffle
 
@@ -11,7 +12,7 @@ def main():
 
 def generate_game():
     all_constraints = load_constraints()
-    shuffle(all_constraints)
+    all_constraints = weighted_shuffle(all_constraints, [c.constraint_type.value*100 for c in all_constraints])
     
     game = Game()
     return recursive_search(game, 0, all_constraints)
