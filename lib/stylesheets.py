@@ -25,6 +25,15 @@ min-width: 120;
 padding: 5%;
 """
 
+button_ss_overconstrained = """
+border-radius: 10px;
+font: 25 9pt "Segoe UI Variable Display";
+background-color: rgb(181, 181, 181);
+min-height: 120;
+min-width: 120;
+padding: 5%;
+"""
+
 display_ss = """
 background-color: rgb(255, 255, 255);
 border-radius: 10px;

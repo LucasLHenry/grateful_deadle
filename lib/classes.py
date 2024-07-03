@@ -142,10 +142,12 @@ class SquareStatus(Enum):
     CORRECT = auto()
     INCORRECT = auto()
     UNFILLED = auto()
+    OVERCONSTRAINED = auto()
     
 CORRECT = SquareStatus.CORRECT
 INCORRECT = SquareStatus.INCORRECT
 UNFILLED = SquareStatus.UNFILLED
+OVERCONSTRAINED = SquareStatus.OVERCONSTRAINED
                    
 class GridSquare:
     def __init__(self, 
@@ -163,18 +165,6 @@ class GridSquare:
         self.possibilities: set[str] = set()
         self._db = db
     
-    def update_display(self):
-        match self.status:
-            case SquareStatus.UNFILLED:
-                self._obj.setStyleSheet(ss.button_ss_default)
-                self.text = "—"
-            case SquareStatus.CORRECT:
-                self._obj.setStyleSheet(ss.button_ss_correct)
-                self.text = get_songname_from_hash(self.song_hash)
-            case SquareStatus.INCORRECT:
-                self._obj.setStyleSheet(ss.button_ss_incorrect)
-        self._obj.setText(wrap(self.text, self.wrap_len))
-    
     def connect_click_callback(self, callback_fn: Callable):
         self._obj.clicked.connect(partial(callback_fn, self.x, self.y))
         
@@ -186,6 +176,7 @@ class GridSquare:
             self.status = UNFILLED
             self._obj.setStyleSheet(ss.button_ss_default)
             self.text = "—"
+            self.song_hash = "xxxxxxxx"
         else:
             try:
                 self.song_hash = get_hash_from_songname(song_name, self._db)
@@ -204,6 +195,13 @@ class GridSquare:
                     self._obj.setStyleSheet(ss.button_ss_incorrect)
         
         self._obj.setText(wrap(self.text, self.wrap_len))
+        return self.song_hash
+    
+    def check_overconstrained(self, used_hashes: set[str]):
+        if len(self.possibilities - used_hashes) == 0:
+            self.status = OVERCONSTRAINED
+            self._obj.setStyleSheet(ss.button_ss_overconstrained)
+        
         
         
 

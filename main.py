@@ -9,7 +9,6 @@ from lib.classes import (
     INCORRECT
 )
 from game_algorithm import generate_game
-from functools import partial
 import lib.stylesheets as ss
 from lib.utils import wrap
 from lib.database.db_utils import get_hash_from_songname, get_db
@@ -45,7 +44,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for grid_row in self.grid_buttons:
             for button in grid_row:
                 button.connect_click_callback(self._show_input_window)
-                #button.clicked.connect(partial(self._show_input_window, row, col))
         self.restart_pb.clicked.connect(self._restart_game)
         
         self._all_song_names: list[str] = [songname for _, songname in self._db["songs"].items()]
@@ -53,8 +51,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # set up autocompleter
         self._completer = QtWidgets.QCompleter(self._all_song_names)
         self._completer.setCaseSensitivity(False)
-        
-        #self._game_generation_thread = QtCore.QThread
         
         self.load_new_game()
         self._display_constraints()
@@ -65,26 +61,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot(SubmitWindowInfo)
     def _handle_input_window(self, value: SubmitWindowInfo):
         self.setDisabled(False)  # re-enable main window
-        
         # ignore cancelled inputs
         if value.status == SubmitType.CANCEL:
             return
-        
         x, y = value.pos
-        self.grid_buttons[x][y].update(value.song_name)
-        
-        # if value.song_name == "":
-        #     self.grid_buttons[x][y].status = UNFILLED
-        # else:
-        #     self.grid_buttons[x][y].text = value.song_name
-        #     song_hash = get_hash_from_songname(value.song_name, self._db)
-        #     self.grid_buttons[x][y].song_hash = song_hash
-        #     if song_hash in self._game.possibilities_at(x, y):
-        #         self.grid_buttons[x][y].status = CORRECT
-        #     else:
-        #         self.grid_buttons[x][y].status = INCORRECT
-                
-        # self.grid_buttons[x][y].update_display()
+        hash = self.grid_buttons[x][y].update(value.song_name)
+        self._update_game_status(hash)
     
     def _show_input_window(self, row:int, col:int):
         self._iw = InputWindow()
@@ -144,7 +126,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             for j in range(3):
                 self.grid_buttons[i][j].possibilities = self._game.possibilities_at(i, j)
     
-    def _update_game_status(self):
+    def _update_game_status(self, song_hash: str):  
+        for i in range(3): 
+            for j in range(3):
+                self.grid_buttons[i][j].possibilities.discard(song_hash)
         self._check_complete()
 
 
