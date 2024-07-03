@@ -27,6 +27,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             [self.row_1_l, self.row_2_l, self.row_3_l]
         ]
         
+        self._correct_squares = [[False] * 3 for _ in range(3)]
+        
         # connect input window popup signals
         for row, grid_row in enumerate(self.grid_buttons):
             for col, button in enumerate(grid_row):
@@ -63,12 +65,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.grid_buttons[x][y].setStyleSheet(ss.button_ss_default)
             return
         
-        self.grid_buttons[x][y].setText(wrap(value.song_name, 15))
+        self.grid_buttons[x][y].setText(wrap(value.song_name, 14))
         song_hash = get_hash_from_songname(value.song_name, self._db)
         if song_hash in self._game.possibilities_at(x, y):
             self.grid_buttons[x][y].setStyleSheet(ss.button_ss_correct)
+            self._correct_squares[x][y] = True
+            self._check_complete()
         else:
             self.grid_buttons[x][y].setStyleSheet(ss.button_ss_incorrect)
+            self._correct_squares[x][y] = False
     
     def _show_input_window(self, row:int, col:int):
         self._iw = InputWindow()
@@ -109,6 +114,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self._set_styles_to_default()
         self.setWindowTitle("The Grateful Grid")
         self.setDisabled(False)
+        for button_list in self.grid_buttons:
+            for button in button_list:
+                button.setDisabled(False)
+    
+    def _check_complete(self):
+        if self._correct_squares == [[True]*3]*3:
+            self.setWindowTitle("YOU WIN!")
+            for button_list in self.grid_buttons:
+                for button in button_list:
+                    button.setDisabled(True)
 
 
 # runner and include guard
