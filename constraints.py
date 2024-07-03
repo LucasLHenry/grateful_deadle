@@ -1,6 +1,6 @@
 from lib.classes import Constraint, ConstraintType
 from lib.database.db_utils import db_type
-from utils import parse_date_str
+from lib.utils import parse_date_str
 import io, json
 from CONFIG import ROOT_DIR, DB_FILENAME, CONSTRAINTS_FILENAME
 from datetime import date

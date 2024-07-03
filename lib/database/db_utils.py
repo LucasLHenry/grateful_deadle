@@ -15,7 +15,7 @@ def get_songname_from_hash(hash: str, db: db_type) -> str:
 def get_hash_from_songname(songname: str, db: db_type) -> str:
     for hash, _songname in db["songs"].items():
         if _songname.lower() == songname.lower(): return hash
-    return "NOT A VALID SONG"
+    raise ValueError("songname not in list")
 
 def get_db():
     with io.open(f"{ROOT_DIR}/lib/database/{DB_FILENAME.lower()}", mode='r', encoding='utf-8') as f:

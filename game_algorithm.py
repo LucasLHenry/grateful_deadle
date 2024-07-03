@@ -2,7 +2,7 @@ from lib.classes import Constraint, Game
 from typing import Optional
 from constraints import load_constraints  
 from lib.database.db_utils import get_db
-from utils import weighted_shuffle
+from lib.utils import weighted_shuffle
 
 def main():
     game = generate_game()

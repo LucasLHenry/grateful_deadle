@@ -1,11 +1,21 @@
 from datetime import date
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Optional
-from utils import gen_hash, parse_date_str
-from lib.database.db_utils import get_songname_from_hash
+from typing import Optional, Callable, TypeVar
+from lib.utils import gen_hash, parse_date_str, wrap
+from lib.database.db_utils import (
+    get_songname_from_hash, 
+    get_hash_from_songname,
+    db_type
+)
 from CONFIG import MINIMUM_SOLUTION_POSSIBILITES
 import constraint as csp
+from PyQt5.QtCore import pyqtSignal
+from PyQt5 import QtWidgets
+import threading as tr
+from time import perf_counter
+import lib.stylesheets as ss
+from functools import partial
 
 # these two classes (SubmitType and SubmitWindowInfo) are passed
 # between the main window and the input window to provide info
@@ -87,7 +97,7 @@ class Game:
         c1 = self.top_constraints[x].songs if self.top_constraints[x] is not None else set()
         c2 = self.side_constraints[y].songs if self.side_constraints[y] is not None else set()
         if len(c1) == 0 and len(c2) == 0:
-            return set(str(list(range(99))))  # flag value, definitely computationally inefficient though
+            return set(str(list(range(10))))  # flag value, definitely computationally inefficient though
         elif len(c1) == 0: return c2
         elif len(c2) == 0: return c1
         return c1 & c2
@@ -99,13 +109,13 @@ class Game:
                 if len(self.possibilities_at(i, j)) < MINIMUM_SOLUTION_POSSIBILITES:
                     return False
         
+        # also, there must be a solution where all the songs are different
         problem = csp.Problem()
         for i in range(3):
             for j in range(3):
                 problem.addVariable(f"{i}{j}", list(self.possibilities_at(i, j)))
         problem.addConstraint(csp.AllDifferentConstraint())
         if problem.getSolution() is None:
-            print("invalid soln")
             return False
         
         return True
@@ -126,3 +136,84 @@ class Game:
                 print(f"songs at {i+1}, {j+1}:")
                 for song_hash in self.possibilities_at(i, j):
                     print(f"\t{get_songname_from_hash(song_hash, db)}")
+ 
+
+class SquareStatus(Enum):
+    CORRECT = auto()
+    INCORRECT = auto()
+    UNFILLED = auto()
+    
+CORRECT = SquareStatus.CORRECT
+INCORRECT = SquareStatus.INCORRECT
+UNFILLED = SquareStatus.UNFILLED
+                   
+class GridSquare:
+    def __init__(self, 
+                 pos: tuple[int, int], 
+                 qt_object: QtWidgets.QPushButton, 
+                 wrap_chars: int,
+                 db: db_type
+                ):
+        self._obj = qt_object
+        self.x, self.y = pos
+        self.wrap_len = wrap_chars
+        self.status = SquareStatus.UNFILLED
+        self.text = "—"
+        self.song_hash: str|None = None
+        self.possibilities: set[str] = set()
+        self._db = db
+    
+    def update_display(self):
+        match self.status:
+            case SquareStatus.UNFILLED:
+                self._obj.setStyleSheet(ss.button_ss_default)
+                self.text = "—"
+            case SquareStatus.CORRECT:
+                self._obj.setStyleSheet(ss.button_ss_correct)
+                self.text = get_songname_from_hash(self.song_hash)
+            case SquareStatus.INCORRECT:
+                self._obj.setStyleSheet(ss.button_ss_incorrect)
+        self._obj.setText(wrap(self.text, self.wrap_len))
+    
+    def connect_click_callback(self, callback_fn: Callable):
+        self._obj.clicked.connect(partial(callback_fn, self.x, self.y))
+        
+    def set_enable(self, enabled: bool):
+        self._obj.setEnabled(enabled)
+        
+    def update(self, song_name: str):
+        if song_name == "":
+            self.status = UNFILLED
+            self._obj.setStyleSheet(ss.button_ss_default)
+            self.text = "—"
+        else:
+            try:
+                self.song_hash = get_hash_from_songname(song_name, self._db)
+            except ValueError:
+                self.song_hash = "xxxxxxxx"
+                self.status = INCORRECT
+                self._obj.setStyleSheet(ss.button_ss_incorrect)
+                self.text = "NOT IN SONG LIST"
+            else:  # executes if no errors
+                self.text = song_name
+                if self.song_hash in self.possibilities:
+                    self.status = CORRECT
+                    self._obj.setStyleSheet(ss.button_ss_correct)
+                else:
+                    self.status = INCORRECT
+                    self._obj.setStyleSheet(ss.button_ss_incorrect)
+        
+        self._obj.setText(wrap(self.text, self.wrap_len))
+        
+        
+
+# T = TypeVar('T')
+# class restartingThread():
+#     finished = pyqtSignal(T)
+#     def __init__(self, func: Callable[[], T], timeout_ms: int):
+#         self._f = func
+#         self._timeout = timeout_ms
+#         self.thread = tr.Thread(target=self._f, args=(), daemon=True)
+    
+#     def start(self):
+#         self._time_ms = -perf_counter() / 1000

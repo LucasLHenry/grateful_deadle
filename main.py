@@ -1,11 +1,19 @@
 from ui.main_window import Ui_MainWindow
 from input_window_logic import InputWindow
-from lib.classes import SubmitWindowInfo, SubmitType
+from lib.classes import (
+    SubmitWindowInfo, 
+    SubmitType, 
+    GridSquare,
+    CORRECT,
+    UNFILLED,
+    INCORRECT
+)
 from game_algorithm import generate_game
 from functools import partial
-import stylesheets as ss
-from utils import wrap
+import lib.stylesheets as ss
+from lib.utils import wrap
 from lib.database.db_utils import get_hash_from_songname, get_db
+from CONFIG import DEBUG, PB_WRAP_LEN
 
 from PyQt5 import QtWidgets, QtCore
 import sys
@@ -15,12 +23,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
         
-        # put UI elements into array for ease of access
-        self.grid_buttons: list[list[QtWidgets.QPushButton]] = [
-            [self.r1c1_pb, self.r1c2_pb, self.r1c3_pb],
-            [self.r2c1_pb, self.r2c2_pb, self.r2c3_pb],
-            [self.r3c1_pb, self.r3c2_pb, self.r3c3_pb]
-        ]
+        # get data from db
+        self._db = get_db()
+        
+        # generate GridSquare objects
+        self.grid_buttons: list[list[GridSquare]] = []
+        for i in range(3):
+            buf = []
+            for j in range(3):
+                buf.append(GridSquare((i, j), getattr(self, f"r{i+1}c{j+1}_pb"), PB_WRAP_LEN, self._db))
+            self.grid_buttons.append(buf)
         
         self.grid_displays: list[list[QtWidgets.QLabel]] = [
             [self.col_1_l, self.col_2_l, self.col_3_l],
@@ -30,22 +42,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self._correct_squares = [[False] * 3 for _ in range(3)]
         
         # connect input window popup signals
-        for row, grid_row in enumerate(self.grid_buttons):
-            for col, button in enumerate(grid_row):
-                button.clicked.connect(partial(self._show_input_window, row, col))
+        for grid_row in self.grid_buttons:
+            for button in grid_row:
+                button.connect_click_callback(self._show_input_window)
+                #button.clicked.connect(partial(self._show_input_window, row, col))
         self.restart_pb.clicked.connect(self._restart_game)
         
-        # get data from db
-        self._db = get_db()
         self._all_song_names: list[str] = [songname for _, songname in self._db["songs"].items()]
         
         # set up autocompleter
         self._completer = QtWidgets.QCompleter(self._all_song_names)
         self._completer.setCaseSensitivity(False)
         
-        self._game = generate_game()
-        print(self._game)
-        self._game.print_all_info(self._db)
+        #self._game_generation_thread = QtCore.QThread
+        
+        self.load_new_game()
         self._display_constraints()
         
         self._set_styles_to_default()
@@ -60,20 +71,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             return
         
         x, y = value.pos
-        if value.song_name == "":
-            self.grid_buttons[x][y].setText("—")
-            self.grid_buttons[x][y].setStyleSheet(ss.button_ss_default)
-            return
+        self.grid_buttons[x][y].update(value.song_name)
         
-        self.grid_buttons[x][y].setText(wrap(value.song_name, 14))
-        song_hash = get_hash_from_songname(value.song_name, self._db)
-        if song_hash in self._game.possibilities_at(x, y):
-            self.grid_buttons[x][y].setStyleSheet(ss.button_ss_correct)
-            self._correct_squares[x][y] = True
-            self._check_complete()
-        else:
-            self.grid_buttons[x][y].setStyleSheet(ss.button_ss_incorrect)
-            self._correct_squares[x][y] = False
+        # if value.song_name == "":
+        #     self.grid_buttons[x][y].status = UNFILLED
+        # else:
+        #     self.grid_buttons[x][y].text = value.song_name
+        #     song_hash = get_hash_from_songname(value.song_name, self._db)
+        #     self.grid_buttons[x][y].song_hash = song_hash
+        #     if song_hash in self._game.possibilities_at(x, y):
+        #         self.grid_buttons[x][y].status = CORRECT
+        #     else:
+        #         self.grid_buttons[x][y].status = INCORRECT
+                
+        # self.grid_buttons[x][y].update_display()
     
     def _show_input_window(self, row:int, col:int):
         self._iw = InputWindow()
@@ -95,8 +106,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def _set_styles_to_default(self):
         for button_list in self.grid_buttons:
             for button in button_list:
-                button.setStyleSheet(ss.button_ss_default)
-                button.setText("—")
+                button.update("")
         
         for display_list in self.grid_displays:
             for display in display_list:
@@ -108,22 +118,34 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def _restart_game(self):
         self.setDisabled(True)
         self.setWindowTitle("Loading...")
-        self._game = generate_game()
-        self._game.print_all_info(self._db)
+        self.load_new_game()
         self._display_constraints()
         self._set_styles_to_default()
         self.setWindowTitle("The Grateful Grid")
         self.setDisabled(False)
         for button_list in self.grid_buttons:
             for button in button_list:
-                button.setDisabled(False)
+                button.set_enable(False)
     
     def _check_complete(self):
-        if self._correct_squares == [[True]*3]*3:
-            self.setWindowTitle("YOU WIN!")
-            for button_list in self.grid_buttons:
-                for button in button_list:
-                    button.setDisabled(True)
+        for button_list in self.grid_buttons:
+            for button in button_list:
+                if button.status != CORRECT: return
+        
+        self.setWindowTitle("YOU WIN!")
+        for button_list in self.grid_buttons:
+            for button in button_list:
+                button.set_enable(True)
+    
+    def load_new_game(self):
+        self._game = generate_game()
+        if DEBUG: self._game.print_all_info(self._db)
+        for i in range(3):
+            for j in range(3):
+                self.grid_buttons[i][j].possibilities = self._game.possibilities_at(i, j)
+    
+    def _update_game_status(self):
+        self._check_complete()
 
 
 # runner and include guard

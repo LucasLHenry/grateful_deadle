@@ -7,3 +7,7 @@ CONSTRAINTS_FILENAME = "CONSTRAINTS.JSON"
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 MINIMUM_SOLUTION_POSSIBILITES = 2
+
+DEBUG = True
+
+PB_WRAP_LEN = 14
