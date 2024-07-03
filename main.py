@@ -22,9 +22,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             [self.r3c1_pb, self.r3c2_pb, self.r3c3_pb]
         ]
         
-        self.grid_displays: list[list[QtWidgets.QTextEdit]] = [
-            [self.col_1_te, self.col_2_te, self.col_3_te],
-            [self.row_1_te, self.row_2_te, self.row_3_te]
+        self.grid_displays: list[list[QtWidgets.QLabel]] = [
+            [self.col_1_l, self.col_2_l, self.col_3_l],
+            [self.row_1_l, self.row_2_l, self.row_3_l]
         ]
         
         # connect input window popup signals
@@ -82,8 +82,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def _display_constraints(self):
         for top_display, top_constraint in zip(self.grid_displays[0], self._game.top_constraints):
             top_display.setText(str(top_constraint))
+            top_display.setWordWrap(True)
         for side_display, side_constraint in zip(self.grid_displays[1], self._game.side_constraints):
             side_display.setText(str(side_constraint))
+            side_display.setWordWrap(True)
                 
     def _set_styles_to_default(self):
         for button_list in self.grid_buttons:

@@ -4,6 +4,7 @@ font: 25 9pt "Segoe UI Variable Display";
 background-color: rgb(234, 235, 164);
 min-height: 120;
 min-width: 120;
+padding: 5%;
 """
 
 button_ss_correct = """
@@ -12,6 +13,7 @@ font: 25 9pt "Segoe UI Variable Display";
 background-color: rgb(124, 214, 85);
 min-height: 120;
 min-width: 120;
+padding: 5%;
 """
 
 button_ss_incorrect = """
@@ -20,12 +22,14 @@ font: 25 9pt "Segoe UI Variable Display";
 background-color: rgb(239, 93, 95);
 min-height: 120;
 min-width: 120;
+padding: 5%;
 """
 
 display_ss = """
-border-radius: 10px;
-font: 9pt "Segoe UI Variable Display";
 background-color: rgb(255, 255, 255);
+border-radius: 10px;
+font: "Segoe UI Variable Display";
+padding: 5%;
 """
 
 restart_button_ss = """

@@ -10,6 +10,12 @@
     <height>526</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>The Grateful Grid</string>
   </property>
@@ -24,6 +30,12 @@ QTextEdit {
 	font: 10pt &quot;Segoe UI Variable Display&quot;;
 	
 	background-color: rgb(255, 255, 255);
+}
+
+QLabel {
+	background-color: rgb(255, 255, 255);
+	border-radius: 10px;
+	font: &quot;Segoe UI Variable Display&quot;;
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -245,28 +257,6 @@ QTextEdit {
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QTextEdit" name="col_1_te"/>
-      </item>
-      <item row="0" column="2">
-       <widget class="QTextEdit" name="col_2_te"/>
-      </item>
-      <item row="0" column="3">
-       <widget class="QTextEdit" name="col_3_te"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QTextEdit" name="row_1_te"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QTextEdit" name="row_2_te">
-        <property name="readOnly">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QTextEdit" name="row_3_te"/>
-      </item>
       <item row="0" column="0">
        <widget class="QPushButton" name="restart_pb">
         <property name="sizePolicy">
@@ -277,6 +267,82 @@ QTextEdit {
         </property>
         <property name="text">
          <string>Restart</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="col_1_l">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel {
+background-color: rgb(255, 255, 255);
+border-radius: 10px;
+text-align: center;
+}</string>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="col_2_l">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="col_3_l">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="row_1_l">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="row_2_l">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="row_3_l">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>

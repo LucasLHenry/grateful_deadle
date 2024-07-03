@@ -15,6 +15,11 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(582, 526)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
+        MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setStyleSheet("QPushButton {\n"
 "    border-radius: 10px;\n"
 "    background-color: rgb(234, 235, 164)\n"
@@ -25,6 +30,12 @@ class Ui_MainWindow(object):
 "    font: 10pt \"Segoe UI Variable Display\";\n"
 "    \n"
 "    background-color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"QLabel {\n"
+"    background-color: rgb(255, 255, 255);\n"
+"    border-radius: 10px;\n"
+"    font: \"Segoe UI Variable Display\";\n"
 "}")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -139,25 +150,6 @@ class Ui_MainWindow(object):
         self.r1c2_pb.setMinimumSize(QtCore.QSize(120, 120))
         self.r1c2_pb.setObjectName("r1c2_pb")
         self.gridLayout.addWidget(self.r1c2_pb, 1, 2, 1, 1)
-        self.col_1_te = QtWidgets.QTextEdit(self.centralwidget)
-        self.col_1_te.setObjectName("col_1_te")
-        self.gridLayout.addWidget(self.col_1_te, 0, 1, 1, 1)
-        self.col_2_te = QtWidgets.QTextEdit(self.centralwidget)
-        self.col_2_te.setObjectName("col_2_te")
-        self.gridLayout.addWidget(self.col_2_te, 0, 2, 1, 1)
-        self.col_3_te = QtWidgets.QTextEdit(self.centralwidget)
-        self.col_3_te.setObjectName("col_3_te")
-        self.gridLayout.addWidget(self.col_3_te, 0, 3, 1, 1)
-        self.row_1_te = QtWidgets.QTextEdit(self.centralwidget)
-        self.row_1_te.setObjectName("row_1_te")
-        self.gridLayout.addWidget(self.row_1_te, 1, 0, 1, 1)
-        self.row_2_te = QtWidgets.QTextEdit(self.centralwidget)
-        self.row_2_te.setReadOnly(False)
-        self.row_2_te.setObjectName("row_2_te")
-        self.gridLayout.addWidget(self.row_2_te, 2, 0, 1, 1)
-        self.row_3_te = QtWidgets.QTextEdit(self.centralwidget)
-        self.row_3_te.setObjectName("row_3_te")
-        self.gridLayout.addWidget(self.row_3_te, 3, 0, 1, 1)
         self.restart_pb = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -166,6 +158,41 @@ class Ui_MainWindow(object):
         self.restart_pb.setSizePolicy(sizePolicy)
         self.restart_pb.setObjectName("restart_pb")
         self.gridLayout.addWidget(self.restart_pb, 0, 0, 1, 1)
+        self.col_1_l = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.col_1_l.sizePolicy().hasHeightForWidth())
+        self.col_1_l.setSizePolicy(sizePolicy)
+        self.col_1_l.setAutoFillBackground(False)
+        self.col_1_l.setStyleSheet("QLabel {\n"
+"background-color: rgb(255, 255, 255);\n"
+"border-radius: 10px;\n"
+"text-align: center;\n"
+"}")
+        self.col_1_l.setAlignment(QtCore.Qt.AlignCenter)
+        self.col_1_l.setObjectName("col_1_l")
+        self.gridLayout.addWidget(self.col_1_l, 0, 1, 1, 1)
+        self.col_2_l = QtWidgets.QLabel(self.centralwidget)
+        self.col_2_l.setAlignment(QtCore.Qt.AlignCenter)
+        self.col_2_l.setObjectName("col_2_l")
+        self.gridLayout.addWidget(self.col_2_l, 0, 2, 1, 1)
+        self.col_3_l = QtWidgets.QLabel(self.centralwidget)
+        self.col_3_l.setAlignment(QtCore.Qt.AlignCenter)
+        self.col_3_l.setObjectName("col_3_l")
+        self.gridLayout.addWidget(self.col_3_l, 0, 3, 1, 1)
+        self.row_1_l = QtWidgets.QLabel(self.centralwidget)
+        self.row_1_l.setAlignment(QtCore.Qt.AlignCenter)
+        self.row_1_l.setObjectName("row_1_l")
+        self.gridLayout.addWidget(self.row_1_l, 1, 0, 1, 1)
+        self.row_2_l = QtWidgets.QLabel(self.centralwidget)
+        self.row_2_l.setAlignment(QtCore.Qt.AlignCenter)
+        self.row_2_l.setObjectName("row_2_l")
+        self.gridLayout.addWidget(self.row_2_l, 2, 0, 1, 1)
+        self.row_3_l = QtWidgets.QLabel(self.centralwidget)
+        self.row_3_l.setAlignment(QtCore.Qt.AlignCenter)
+        self.row_3_l.setObjectName("row_3_l")
+        self.gridLayout.addWidget(self.row_3_l, 3, 0, 1, 1)
         self.verticalLayout_2.addLayout(self.gridLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -193,3 +220,9 @@ class Ui_MainWindow(object):
         self.r3c1_pb.setText(_translate("MainWindow", "—"))
         self.r1c2_pb.setText(_translate("MainWindow", "—"))
         self.restart_pb.setText(_translate("MainWindow", "Restart"))
+        self.col_1_l.setText(_translate("MainWindow", "TextLabel"))
+        self.col_2_l.setText(_translate("MainWindow", "TextLabel"))
+        self.col_3_l.setText(_translate("MainWindow", "TextLabel"))
+        self.row_1_l.setText(_translate("MainWindow", "TextLabel"))
+        self.row_2_l.setText(_translate("MainWindow", "TextLabel"))
+        self.row_3_l.setText(_translate("MainWindow", "TextLabel"))
