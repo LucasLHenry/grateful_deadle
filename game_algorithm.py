@@ -4,8 +4,6 @@ from constraints import load_constraints
 from lib.database.db_utils import get_db
 from utils import weighted_shuffle
 
-from random import shuffle
-
 def main():
     game = generate_game()
     game.print_all_info(get_db())

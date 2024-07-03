@@ -21,4 +21,4 @@ def wrap(s: str, len):
 
 T=TypeVar('T')
 def weighted_shuffle(items: Iterable[T], weight_func: Callable[[T], float]) -> list[T]:
-    return sorted(items, key=lambda i: random.random() ** (1.0 / weight_func(i)), reverse=True)
+    return sorted(items, key=lambda t: random.random() ** (1.0 / weight_func(t)), reverse=True)

@@ -47,7 +47,7 @@ class Constraint:
             case ConstraintType.TOUR:
                 raise ValueError("tour not implemented")
             case ConstraintType.PLAY_AMT:
-                raise ValueError("play_amt not implemented")
+                return f"Played exactly {self.value} times"
             case ConstraintType.PLAYED_AT:
                 raise ValueError("played_at not implemented")
     

@@ -99,9 +99,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.restart_pb.setStyleSheet(ss.restart_button_ss)
     
     def _restart_game(self):
+        self.setDisabled(True)
+        self.setWindowTitle("Loading...")
         self._game = generate_game()
+        self._game.print_all_info(self._db)
         self._display_constraints()
         self._set_styles_to_default()
+        self.setWindowTitle("The Grateful Grid")
+        self.setDisabled(False)
 
 
 # runner and include guard
