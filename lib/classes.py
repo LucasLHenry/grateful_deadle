@@ -5,6 +5,7 @@ from typing import Optional
 from utils import gen_hash, parse_date_str
 from lib.database.db_utils import get_songname_from_hash
 from CONFIG import MINIMUM_SOLUTION_POSSIBILITES
+import constraint as csp
 
 # these two classes (SubmitType and SubmitWindowInfo) are passed
 # between the main window and the input window to provide info
@@ -92,11 +93,21 @@ class Game:
         return c1 & c2
     
     def is_valid(self) -> bool:
-        # each song square must have at least one solution
+        # each song square must have at least min_soln_possibilites solutions
         for i in range(3):
             for j in range(3):
                 if len(self.possibilities_at(i, j)) < MINIMUM_SOLUTION_POSSIBILITES:
                     return False
+        
+        problem = csp.Problem()
+        for i in range(3):
+            for j in range(3):
+                problem.addVariable(f"{i}{j}", list(self.possibilities_at(i, j)))
+        problem.addConstraint(csp.AllDifferentConstraint())
+        if problem.getSolution() is None:
+            print("invalid soln")
+            return False
+        
         return True
                 
     def __str__(self) -> str:
