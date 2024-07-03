@@ -24,10 +24,11 @@ class SubmitWindowInfo:
 
 class ConstraintType(Enum):
     DATE = auto()
+    PLAYED_AT = auto()
     DEBUT = auto()
     TOUR = auto()
     PLAY_AMT = auto()
-    PLAYED_AT = auto()
+    
 
 
 class Constraint:
@@ -49,7 +50,7 @@ class Constraint:
             case ConstraintType.PLAY_AMT:
                 return f"Played exactly {self.value} times"
             case ConstraintType.PLAYED_AT:
-                raise ValueError("played_at not implemented")
+                return f"Played at {self.value}"
     
     def gen_constraint_hash(c_type: int, value: str):
         return gen_hash(str(c_type) + value, 10)

@@ -10,7 +10,7 @@ def main():
 
 def generate_game():
     all_constraints = load_constraints()
-    all_constraints = weighted_shuffle(all_constraints, lambda c: c.constraint_type.value ** 3)
+    all_constraints = weighted_shuffle(all_constraints, lambda c: c.constraint_type.value)
     
     game = Game()
     return recursive_search(game, 0, all_constraints)

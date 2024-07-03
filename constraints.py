@@ -23,9 +23,10 @@ def main():  # generates constraints list
         db: db_type = json.load(f)
         
     parsed_dict = dict()
-    add_constraints_to_out_dict_and_print(filter_constraints(generate_date_constraints(db)),     parsed_dict)
-    add_constraints_to_out_dict_and_print(filter_constraints(generate_debut_constraints(db)),    parsed_dict)
-    add_constraints_to_out_dict_and_print(filter_constraints(generate_play_amt_constraints(db)), parsed_dict)
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_date_constraints(db)),      parsed_dict)
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_debut_constraints(db)),     parsed_dict)
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_play_amt_constraints(db)),  parsed_dict)
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_played_at_constraints(db)), parsed_dict)
     
     with io.open(f"{ROOT_DIR}/lib/database/{CONSTRAINTS_FILENAME.lower()}", mode='w', encoding='utf-8') as f:
         json.dump(parsed_dict, f, ensure_ascii=False, indent=4)
@@ -38,6 +39,21 @@ def add_constraints_to_out_dict_and_print(constraint_list: list[Constraint], out
 def filter_constraints(constraint_list: list[Constraint]) -> list[Constraint]:
     # only want constraints with at least 3 songs, otherwise they aren't useful
     return [c for c in constraint_list if len(c.songs) >= 3]
+
+def load_constraints() -> list[Constraint]:
+    with io.open(f"{ROOT_DIR}/lib/database/{CONSTRAINTS_FILENAME.lower()}", mode='r', encoding='utf-8') as f:
+        cdb = json.load(f)
+    
+    all_constraints = []
+    for _, val in cdb.items():
+        all_constraints.append(Constraint.from_dict(val))
+    
+    return all_constraints
+
+
+
+
+############## CONSTRAINT GENERATION ALGORITHMS START HERE ###################
 
 def generate_date_constraints(db: db_type) -> list[Constraint]:
     # this constraint is: the song must have been played on this date.
@@ -94,15 +110,20 @@ def generate_play_amt_constraints(db: db_type) -> list[Constraint]:
     
     return constraint_list
 
-def load_constraints() -> list[Constraint]:
-    with io.open(f"{ROOT_DIR}/lib/database/{CONSTRAINTS_FILENAME.lower()}", mode='r', encoding='utf-8') as f:
-        cdb = json.load(f)
+def generate_played_at_constraints(db: db_type) -> list[Constraint]:
+    c_type = ConstraintType.PLAYED_AT
     
-    all_constraints = []
-    for _, val in cdb.items():
-        all_constraints.append(Constraint.from_dict(val))
+    constraint_dict: dict[str, Constraint] = {}
+    for _, setlist in db["sets"].items():
+        venue_hash = setlist["venue_id"]
+        venue_name = db["venues"][venue_hash]["name"]
+        constraint_dict[venue_hash] = Constraint(c_type, venue_name)
     
-    return all_constraints
+    for _, setlist in db["sets"].items():
+        for song_hash in setlist["songs"]:
+            constraint_dict[setlist["venue_id"]].songs.add(song_hash)
+        
+    return [c for _, c in constraint_dict.items()]
 
 if __name__ == "__main__":
     main()
