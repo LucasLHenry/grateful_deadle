@@ -1,5 +1,7 @@
 from ui.main_window import Ui_MainWindow
 from input_window_logic import InputWindow
+from error_window_logic import ErrorWindow
+from functools import partial
 from lib.classes import (
     SubmitWindowInfo, 
     SubmitType, 
@@ -38,7 +40,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             [self.row_1_l, self.row_2_l, self.row_3_l]
         ]
         
-        self._correct_squares = [[False] * 3 for _ in range(3)]
+        self._used_song_hashes: set[str] = set()
         
         # connect input window popup signals
         for grid_row in self.grid_buttons:
@@ -64,6 +66,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # ignore cancelled inputs
         if value.status == SubmitType.CANCEL:
             return
+        
+        try:
+            song_hash = get_hash_from_songname(value.song_name)
+        except ValueError:
+            self._show_error_window("Invalid Song!")
+            return
+            
         x, y = value.pos
         hash = self.grid_buttons[x][y].update(value.song_name)
         self._update_game_status(hash)
@@ -131,6 +140,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             for j in range(3):
                 self.grid_buttons[i][j].possibilities.discard(song_hash)
         self._check_complete()
+
+    def _show_error_window(self, text: str):
+        self._ew = ErrorWindow()
+        self._ew.label.setText(text)
+        self._ew.callback.connect(partial(self.setDisabled, False))
+        self._ew.show()
+        self.setDisabled(True)
 
 
 # runner and include guard
