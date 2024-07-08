@@ -67,15 +67,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if value.status == SubmitType.CANCEL:
             return
         
+        
+        x, y = value.pos
+        if value.song_name == "":
+            self.grid_buttons[x][y].clear()
+            self._update_game_status()
+            self._check_complete()
+            return
+        
         try:
             song_hash = get_hash_from_songname(value.song_name)
         except ValueError:
             self._show_error_window("Invalid Song!")
             return
+        
+        if song_hash in self._used_song_hashes:
+            self._show_error_window("Song already used...")
+            return
             
-        x, y = value.pos
-        hash = self.grid_buttons[x][y].update(value.song_name)
-        self._update_game_status(hash)
+        self.grid_buttons[x][y].update(song_hash)
+        self._update_game_status()
+        self._check_complete()
     
     def _show_input_window(self, row:int, col:int):
         self._iw = InputWindow()
@@ -97,7 +109,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def _set_styles_to_default(self):
         for button_list in self.grid_buttons:
             for button in button_list:
-                button.update("")
+                button.clear()
         
         for display_list in self.grid_displays:
             for display in display_list:
@@ -116,7 +128,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setDisabled(False)
         for button_list in self.grid_buttons:
             for button in button_list:
-                button.set_enable(False)
+                button.set_enable(True)
+    
+    def _update_game_status(self):
+        self._used_song_hashes = set()
+        for button_list in self.grid_buttons:
+            for button in button_list:
+                if button.song_hash is not None:
+                    self._used_song_hashes.add(button.song_hash)
+                    
+        for button_list in self.grid_buttons:
+            for button in button_list:
+                button.check_overconstrained(self._used_song_hashes)
     
     def _check_complete(self):
         for button_list in self.grid_buttons:
@@ -126,20 +149,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setWindowTitle("YOU WIN!")
         for button_list in self.grid_buttons:
             for button in button_list:
-                button.set_enable(True)
+                button.set_enable(False)
     
     def load_new_game(self):
         self._game = generate_game()
+        self._used_song_hashes = set()
         if DEBUG: self._game.print_all_info(self._db)
         for i in range(3):
             for j in range(3):
                 self.grid_buttons[i][j].possibilities = self._game.possibilities_at(i, j)
-    
-    def _update_game_status(self, song_hash: str):  
-        for i in range(3): 
-            for j in range(3):
-                self.grid_buttons[i][j].possibilities.discard(song_hash)
-        self._check_complete()
 
     def _show_error_window(self, text: str):
         self._ew = ErrorWindow()

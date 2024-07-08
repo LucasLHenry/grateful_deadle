@@ -171,36 +171,44 @@ class GridSquare:
     def set_enable(self, enabled: bool):
         self._obj.setEnabled(enabled)
         
-    def update(self, song_name: str):
-        if song_name == "":
-            self.status = UNFILLED
-            self._obj.setStyleSheet(ss.button_ss_default)
-            self.text = "—"
-            self.song_hash = "xxxxxxxx"
-        else:
-            try:
-                self.song_hash = get_hash_from_songname(song_name, self._db)
-            except ValueError:
-                self.song_hash = "xxxxxxxx"
-                self.status = INCORRECT
-                self._obj.setStyleSheet(ss.button_ss_incorrect)
-                self.text = "NOT IN SONG LIST"
-            else:  # executes if no errors
-                self.text = song_name
-                if self.song_hash in self.possibilities:
-                    self.status = CORRECT
-                    self._obj.setStyleSheet(ss.button_ss_correct)
-                else:
-                    self.status = INCORRECT
-                    self._obj.setStyleSheet(ss.button_ss_incorrect)
+    def update(self, song_hash: str):
+        self.song_hash = song_hash
+        self.status = CORRECT if song_hash in self.possibilities else INCORRECT
+        self.show()
+    
+    def clear(self):
+        self.status = UNFILLED
+        self.song_hash = None
+        self.show()
+    
+    def show(self):
+        sheet = ss.button_ss_default
+        match self.status:
+            case SquareStatus.CORRECT:
+                sheet = ss.button_ss_correct
+            case SquareStatus.INCORRECT:
+                sheet = ss.button_ss_incorrect
+            case SquareStatus.OVERCONSTRAINED:
+                sheet = ss.button_ss_overconstrained
+        self._obj.setStyleSheet(sheet)
         
+        if self.status in (CORRECT, INCORRECT):
+            self.text = get_songname_from_hash(self.song_hash)
+        else:
+            self.text = "—"
         self._obj.setText(wrap(self.text, self.wrap_len))
-        return self.song_hash
+        
+        self.set_enable(self.status != OVERCONSTRAINED)
+            
     
     def check_overconstrained(self, used_hashes: set[str]):
         if len(self.possibilities - used_hashes) == 0:
-            self.status = OVERCONSTRAINED
-            self._obj.setStyleSheet(ss.button_ss_overconstrained)
+            if self.status == UNFILLED:
+                self.status = OVERCONSTRAINED
+        else:
+            if self.status == OVERCONSTRAINED:
+                self.status = UNFILLED
+        self.show()
         
         
         
