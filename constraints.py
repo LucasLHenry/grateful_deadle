@@ -27,6 +27,7 @@ def main():  # generates constraints list
     add_constraints_to_out_dict_and_print(filter_constraints(generate_debut_constraints(db)),     parsed_dict)
     add_constraints_to_out_dict_and_print(filter_constraints(generate_play_amt_constraints(db)),  parsed_dict)
     add_constraints_to_out_dict_and_print(filter_constraints(generate_played_at_constraints(db)), parsed_dict)
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_tour_constraints(db)),      parsed_dict)
     
     with io.open(f"{ROOT_DIR}/lib/database/{CONSTRAINTS_FILENAME.lower()}", mode='w', encoding='utf-8') as f:
         json.dump(parsed_dict, f, ensure_ascii=False, indent=4)
@@ -118,13 +119,25 @@ def generate_played_at_constraints(db: db_type) -> list[Constraint]:
         venue_hash = setlist["venue_id"]
         venue_name = truncate_str(db["venues"][venue_hash]["name"], 25)
         city_name = db["venues"][venue_hash]["city"]
-        constraint_dict[venue_hash] = Constraint(c_type, f"{venue_name}, {city_name}")
-    
-    for _, setlist in db["sets"].items():
+        constraint_dict.setdefault(venue_hash, Constraint(c_type, f"{venue_name}, {city_name}"))
         for song_hash in setlist["songs"]:
             constraint_dict[setlist["venue_id"]].songs.add(song_hash)
         
     return [c for _, c in constraint_dict.items()]
+
+def generate_tour_constraints(db: db_type) -> list[Constraint]:
+    c_type = ConstraintType.TOUR
+    
+    tourless_set_count = 0
+    constraint_dict: dict[str, Constraint] = {}
+    for _, setlist in db["sets"].items():
+        tour_name = setlist["tour"]
+        if tour_name == "No Tour Assigned": tourless_set_count += 1
+        constraint_dict.setdefault(tour_name, Constraint(c_type, f"{tour_name}"))
+        for song_hash in setlist["songs"]:
+            constraint_dict[tour_name].songs.add(song_hash)
+    print(f"{tourless_set_count} sets played without a tour assigned")
+    return [c for _, c in constraint_dict.items() if c.value not in ("No Tour Assigned")]
 
 if __name__ == "__main__":
     main()

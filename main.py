@@ -6,13 +6,10 @@ from lib.classes import (
     SubmitWindowInfo, 
     SubmitType, 
     GridSquare,
-    CORRECT,
-    UNFILLED,
-    INCORRECT
+    CORRECT
 )
 from game_algorithm import generate_game
 import lib.stylesheets as ss
-from lib.utils import wrap
 from lib.database.db_utils import get_hash_from_songname, get_db
 from CONFIG import DEBUG, PB_WRAP_LEN
 

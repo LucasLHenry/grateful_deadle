@@ -57,7 +57,7 @@ class Constraint:
             case ConstraintType.DEBUT:
                 return f"Debuted on {parse_date_str(self.value).strftime("%b %d, %Y")}"
             case ConstraintType.TOUR:
-                raise ValueError("tour not implemented")
+                return f"Played during the {self.value} tour"
             case ConstraintType.PLAY_AMT:
                 return f"Played exactly {self.value} times"
             case ConstraintType.PLAYED_AT:
