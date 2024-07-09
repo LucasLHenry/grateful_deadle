@@ -1,6 +1,6 @@
 from lib.classes import Constraint, ConstraintType
 from lib.database.db_utils import db_type
-from lib.utils import parse_date_str
+from lib.utils import parse_date_str, truncate_str
 import io, json
 from CONFIG import ROOT_DIR, DB_FILENAME, CONSTRAINTS_FILENAME
 from datetime import date
@@ -116,8 +116,9 @@ def generate_played_at_constraints(db: db_type) -> list[Constraint]:
     constraint_dict: dict[str, Constraint] = {}
     for _, setlist in db["sets"].items():
         venue_hash = setlist["venue_id"]
-        venue_name = db["venues"][venue_hash]["name"]
-        constraint_dict[venue_hash] = Constraint(c_type, venue_name)
+        venue_name = truncate_str(db["venues"][venue_hash]["name"], 25)
+        city_name = db["venues"][venue_hash]["city"]
+        constraint_dict[venue_hash] = Constraint(c_type, f"{venue_name}, {city_name}")
     
     for _, setlist in db["sets"].items():
         for song_hash in setlist["songs"]:
