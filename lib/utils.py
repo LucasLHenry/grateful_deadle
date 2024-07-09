@@ -26,13 +26,17 @@ def weighted_shuffle(items: Iterable[T], weight_func: Callable[[T], float]) -> l
     return sorted(items, key=lambda t: random.random() ** (1.0 / weight_func(t)), reverse=True)
 
 
-_song_freq: dict[str, int] = {}
+_song_freq: dict[str, float] = {}
 def calc_game_difficulty(game, db: db_type = _DB) -> int:
+    global _song_freq
     if not _song_freq:
         for _, setlist in db["sets"].items():
             for song_hash in setlist["songs"]:
-                _song_freq.setdefault(song_hash, 0)
+                _song_freq.setdefault(song_hash, 0.0)
                 _song_freq[song_hash] += 1
+        # normalize
+        max_freq = max([freq for _, freq in _song_freq.items()])
+        _song_freq = {hash: freq/max_freq for hash, freq in _song_freq.items()}
                 
     total_possibilities: list[set[str]] = [game.possibilities_at(i, j) for i in range(3) for j in range(3)]
 
@@ -45,8 +49,14 @@ def calc_game_difficulty(game, db: db_type = _DB) -> int:
     min_num_answers = min(num_possibilities)
     max_num_answers = max(num_possibilities)
     if DEBUG: print(f"avg num answers is {avg_num_answers:.2f}, median is {med_num_answers}")
+    
+    weight = lambda hash: _song_freq[hash] + 1
+    foreach = lambda arr, fn: [fn(val) for val in arr]
+    weighted_possibilites = [sum(foreach(songs, weight)) for songs in total_possibilities]
+    return med(weighted_possibilites)
     # lowest num possilibites for a game is set in config, currently it is 1.
     # based on some tests, the average average is around 7, while the average median is around 5.
     # the average range is around 18. (difference between max and min)
-    return (avg_num_answers, med_num_answers, max_num_answers - min_num_answers)
+    
+    # difficulty score will be out of 5, with 1 being easiest and 5 being hardest.
     
