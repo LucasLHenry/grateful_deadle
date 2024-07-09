@@ -4,18 +4,20 @@ from constraints import load_constraints
 from lib.database.db_utils import get_db
 from lib.utils import weighted_shuffle, calc_game_difficulty, run_with_timeout
 
+import matplotlib.pyplot as plt
+
 def main():
     # game = generate_game()
     # game.print_all_info(get_db())
     
-    avgs, meds, ranges = [], [], []
-    for i in range(1000):
-        avg, med, rng = calc_game_difficulty(run_with_timeout(generate_game, 0.5, restart=True))
-        avgs.append(avg)
+    meds = []
+    for _ in range(5000):
+        med = calc_game_difficulty(run_with_timeout(generate_game, 0.5, restart=True))
         meds.append(med)
-        ranges.append(rng)
     a = lambda x: sum(x)/len(x)
-    print(f"\naverage avg is {a(avgs):.2f}, average med is {a(meds):.2f}, average range is {a(ranges):.2f}")
+    print(f"\naverage score is {a(meds):.2f}")
+    plt.hist(meds, density=False, bins=30)
+    plt.show()
 
 def generate_game():
     all_constraints = load_constraints()
