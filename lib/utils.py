@@ -49,7 +49,7 @@ def calc_game_difficulty(game, db: db_type = _DB) -> int:
         max_freq = 0
         for _, setlist in db["sets"].items():
             for song_hash in setlist["songs"]:
-                _song_freq.setdefault(song_hash, 0)
+                _song_freq.setdefault(song_hash, 0.0)
                 _song_freq[song_hash] += 1
                 if _song_freq[song_hash] > max_freq: max_freq = _song_freq[song_hash]
         # normalize
