@@ -2,8 +2,24 @@ from datetime import date, datetime
 import hashlib, textwrap
 from typing import Iterable, Callable, TypeVar
 import random
-from lib.database.db_utils import _DB, db_type
+from lib.database.db_utils import db_type, _DB
 from CONFIG import DEBUG
+from threading import Thread
+
+def run_with_timeout(fn: Callable, time_out: float, restart: bool = False):
+    retval = [None]
+    first_time = True
+    while first_time or (t.is_alive() and restart):
+        t = Thread(target=return_val_wrapper(fn), args=[retval])
+        t.start()
+        t.join(timeout=time_out)
+        first_time = False
+    return retval[0]
+
+def return_val_wrapper(fn: Callable):
+    def inner(args: list):
+        args[0] = fn()
+    return inner
 
 def gen_hash(s: str, len: int) -> str:
     return hashlib.sha256(s.encode('utf-8')).hexdigest()[:len]
@@ -49,7 +65,7 @@ def calc_game_difficulty(game, db: db_type = _DB) -> int:
     min_num_answers = min(num_possibilities)
     max_num_answers = max(num_possibilities)
     if DEBUG: print(f"avg num answers is {avg_num_answers:.2f}, median is {med_num_answers}")
-    
+
     weight = lambda hash: _song_freq[hash] + 1
     foreach = lambda arr, fn: [fn(val) for val in arr]
     weighted_possibilites = [sum(foreach(songs, weight)) for songs in total_possibilities]

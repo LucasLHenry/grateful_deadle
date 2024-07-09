@@ -8,10 +8,11 @@ from lib.classes import (
     GridSquare,
     CORRECT
 )
+from lib.utils import calc_game_difficulty, run_with_timeout
 from game_algorithm import generate_game
 import lib.stylesheets as ss
 from lib.database.db_utils import get_hash_from_songname, get_db
-from CONFIG import DEBUG, PB_WRAP_LEN
+from CONFIG import DEBUG, PB_WRAP_LEN, GAME_GENERATION_TIMEOUT_S
 
 from PyQt5 import QtWidgets, QtCore
 import sys
@@ -149,9 +150,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 button.set_enable(False)
     
     def load_new_game(self):
-        self._game = generate_game()
+        self._game = run_with_timeout(generate_game, GAME_GENERATION_TIMEOUT_S, restart=True)
         self._used_song_hashes = set()
-        if DEBUG: self._game.print_all_info(self._db)
+        if DEBUG: 
+            self._game.print_all_info(self._db)
+            calc_game_difficulty(self._game)
         for i in range(3):
             for j in range(3):
                 self.grid_buttons[i][j].possibilities = self._game.possibilities_at(i, j)
