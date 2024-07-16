@@ -10,7 +10,7 @@ padding: 5%;
 button_ss_correct = """
 border-radius: 10px;
 font: 25 9pt "Segoe UI Variable Display";
-background-color: rgb(124, 214, 85);
+background-color: rgb(85, 214, 112);
 min-height: 120;
 min-width: 120;
 padding: 5%;
@@ -48,3 +48,10 @@ background-color: rgb(234, 235, 164);
 min-height: 120;
 min-width: 120;
 """
+title_background_colour_by_hardness = [
+    "rgb(85, 214, 112);",
+    "rgb(212, 250, 70);",
+    "rgb(231, 208, 40);",
+    "rgb(232, 154, 80);",
+    "rgb(239, 93,  95);"
+]

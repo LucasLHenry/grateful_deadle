@@ -41,9 +41,8 @@ T=TypeVar('T')
 def weighted_shuffle(items: Iterable[T], weight_func: Callable[[T], float]) -> list[T]:
     return sorted(items, key=lambda t: random.random() ** (1.0 / weight_func(t)), reverse=True)
 
-
 _song_freq: dict[str, int] = {}
-def calc_game_difficulty(game, db: db_type = _DB) -> int:
+def calc_game_difficulty(game, raw_vals: bool = False, db: db_type = _DB) -> int:
     global _song_freq
     if not _song_freq:
         max_freq = 0
@@ -56,19 +55,29 @@ def calc_game_difficulty(game, db: db_type = _DB) -> int:
         _song_freq = {hash: freq/max_freq for hash, freq in _song_freq.items()}
                 
     total_possibilities: list[set[str]] = [game.possibilities_at(i, j) for i in range(3) for j in range(3)]
-
-    avg = lambda x: sum(x) / len(x)
-    med = lambda x: sorted(x)[int(len(x)/2)]
+    
     # an easier game has more song possibilites for each answer, and uses more common songs
-    num_possibilities = [len(songs) for songs in total_possibilities]
-    avg_num_answers = avg(num_possibilities)
-    med_num_answers = med(num_possibilities)
     # lowest num possilibites for a game is set in config, currently it is 1.
     # based on some tests, the average average is around 7, while the average median is around 5.
     # the average range is around 18. (difference between max and min)
+    med = lambda x: sorted(x)[int(len(x)/2)]
     weight = lambda hash: _song_freq[hash] + 1
     foreach = lambda arr, fn: [fn(val) for val in arr]
     weighted_possibilites = [sum(foreach(songs, weight)) for songs in total_possibilities]
-    if DEBUG: print(f"score is {med(weighted_possibilites):.2f}")
-    return med(weighted_possibilites)
+    
+    # these cutoffs were calculated using the main() script in game_algorithm.py
+    # they give an approximately uniform score distribution across games
+    # (it's pretty much ultra-basic histogram equalization)
+    score = med(weighted_possibilites)
+    if raw_vals: return score
+    
+    if score < 4:
+        return 5
+    if score < 5:
+        return 4
+    if score < 6:
+        return 3
+    if score < 9:
+        return 2
+    return 1
     

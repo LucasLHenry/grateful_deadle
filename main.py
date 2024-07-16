@@ -151,6 +151,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def load_new_game(self):
         self._game = run_with_timeout(generate_game, GAME_GENERATION_TIMEOUT_S, restart=True)
+        difficulty_score = calc_game_difficulty(self._game)
+        self.difficulty_label.setText(str(difficulty_score))
+        self.difficulty_label.setStyleSheet(f"background-color: {ss.title_background_colour_by_hardness[difficulty_score-1]}")
         self._used_song_hashes = set()
         if DEBUG: 
             self._game.print_all_info(self._db)
