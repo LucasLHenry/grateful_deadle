@@ -1,14 +1,23 @@
 from lib.classes import Constraint, Game
 from typing import Optional
 from constraints import load_constraints  
-from lib.utils import weighted_shuffle
+from lib.utils import weighted_shuffle, generate_constraint_type_weights
+
+_ALL_CONSTRAINTS: list[Constraint]|None = None
+_CONSTRAINT_WEIGHTS: dict[Constraint, int]|None = None
 
 def generate_game():
-    all_constraints = load_constraints()
-    all_constraints = weighted_shuffle(all_constraints, lambda c: c.constraint_type.value)
+    global _ALL_CONSTRAINTS, _CONSTRAINT_WEIGHTS
+    # happens on startup
+    if _ALL_CONSTRAINTS is None:
+        _ALL_CONSTRAINTS = load_constraints()
+        _CONSTRAINT_WEIGHTS = generate_constraint_type_weights(_ALL_CONSTRAINTS)
+    
+    # reshuffle every time
+    shuffled_constraints = weighted_shuffle(_ALL_CONSTRAINTS, lambda c: _CONSTRAINT_WEIGHTS[c.constraint_type])
     
     game = Game()
-    return recursive_search(game, 0, all_constraints)
+    return recursive_search(game, 0, shuffled_constraints)
     
 def recursive_search(
         game: Game, 

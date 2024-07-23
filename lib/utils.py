@@ -81,3 +81,12 @@ def calc_game_difficulty(game, raw_vals: bool = False, db: db_type = _DB) -> int
         return 2
     return 1
     
+    
+def generate_constraint_type_weights(constraint_list):
+    # constraint types that appear less often should have a higher weight
+    c_amt_dict = {}
+    for c in constraint_list:
+        c_amt_dict.setdefault(c.constraint_type, 0)
+        c_amt_dict[c.constraint_type] += 1
+    max_amt = max([amt for _, amt in c_amt_dict.items()])
+    return {k: max_amt / float(v) for k,v in c_amt_dict.items()}
