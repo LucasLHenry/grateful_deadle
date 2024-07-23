@@ -1,5 +1,5 @@
 #!/bin/bash
-
-python -m PyInstaller --noconfirm --onedir --windowed --add-data "C:\Users\lucas\Documents\Projects\Code\Contract Work\Grateful Deadle for Brian\work\lib\database\constraints.json;./lib/database/" --add-data "C:\Users\lucas\Documents\Projects\Code\Contract Work\Grateful Deadle for Brian\work\lib\database\db.json;./lib/database/"  "C:\Users\lucas\Documents\Projects\Code\Contract Work\Grateful Deadle for Brian\work\main.py"
+cwd=$(pwd | sed 's \/c\/ C:\/ g; s \/ \\ g')
+python -m PyInstaller --noconfirm --onedir --windowed --add-data "$cwd\lib\database\constraints.json;./lib/database/" --add-data "$cwd\lib\database\db.json;./lib/database/"  "$cwd\main.py"
 rm -rf build/
 mv dist/main/main.exe dist/main/grateful_grid.exe
