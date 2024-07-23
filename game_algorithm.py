@@ -1,33 +1,7 @@
 from lib.classes import Constraint, Game
 from typing import Optional
 from constraints import load_constraints  
-from lib.database.db_utils import get_db
-from lib.utils import weighted_shuffle, calc_game_difficulty, run_with_timeout
-from math import sqrt
-import matplotlib.pyplot as plt
-import numpy as np
-
-def main():
-    print("starting")
-    # game = generate_game()
-    # game.print_all_info(get_db())
-    
-    meds = []
-    for _ in range(1000):
-        med = calc_game_difficulty(run_with_timeout(generate_game, 0.25, restart=True), True)
-        meds.append(med)
-    avg = lambda x: sum(x)/len(x)
-    std = lambda x, avg: sqrt(sum([(val - avg)**2 for val in x]) / (len(x) - 1))
-    print(f"\naverage score is {avg(meds):.2f}, standard deviation is {std(meds, avg(meds)):.2f}")
-    plt.hist(meds, density=False, bins=30)
-    
-    num_bins = 5
-    meds = sorted(meds)
-    n = len(meds)
-    bin_size = int(n / num_bins)  # number of bins
-    bin_cutoffs = [int(max(meds[i*bin_size:(i+1)*bin_size])) for i in range(num_bins)]
-    print(bin_cutoffs)
-    plt.show()
+from lib.utils import weighted_shuffle
 
 def generate_game():
     all_constraints = load_constraints()
@@ -66,8 +40,3 @@ def recursive_search(
             if ts == 0: game.top_constraints[pos] = None  # assign
             else: game.side_constraints[pos] = None
     return None  # no solutions, backtrack
-
-
-
-if __name__ == "__main__":
-    main()
