@@ -1,5 +1,5 @@
 from lib.classes import Constraint, ConstraintType
-from lib.database.db_utils import db_type
+from lib.database.db_utils import db_type, generate_play_amounts
 from lib.utils import parse_date_str, truncate_str
 import io, json
 from CONFIG import ROOT_DIR, DB_FILENAME, CONSTRAINTS_FILENAME
@@ -23,11 +23,12 @@ def main():  # generates constraints list
         db: db_type = json.load(f)
         
     parsed_dict = dict()
-    add_constraints_to_out_dict_and_print(filter_constraints(generate_date_constraints(db)),      parsed_dict)
-    add_constraints_to_out_dict_and_print(filter_constraints(generate_debut_constraints(db)),     parsed_dict)
-    add_constraints_to_out_dict_and_print(filter_constraints(generate_play_amt_constraints(db)),  parsed_dict)
-    add_constraints_to_out_dict_and_print(filter_constraints(generate_played_at_constraints(db)), parsed_dict)
-    add_constraints_to_out_dict_and_print(filter_constraints(generate_tour_constraints(db)),      parsed_dict)
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_date_constraints(db)),           parsed_dict)
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_debut_constraints(db)),          parsed_dict)
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_play_amt_constraints(db)),       parsed_dict)
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_played_at_constraints(db)),      parsed_dict)
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_tour_constraints(db)),           parsed_dict)
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_play_amt_range_constraints(db)), parsed_dict)
     
     with io.open(f"{ROOT_DIR}/lib/database/{CONSTRAINTS_FILENAME.lower()}", mode='w', encoding='utf-8') as f:
         json.dump(parsed_dict, f, ensure_ascii=False, indent=4)
@@ -96,15 +97,8 @@ def generate_play_amt_constraints(db: db_type) -> list[Constraint]:
     # will be filtered out
     constraint_list: list[Constraint] = [Constraint(c_type, str(i + 1)) for i in range(len(db["sets"]))]
     
-    # init play amount dict
-    play_amts: dict[str, int] = {}
-    for song_hash in db["songs"].keys():
-        play_amts[song_hash] = 0
-    
-    # fill dict
-    for _, setlist in db["sets"].items():
-        for song_hash in setlist["songs"]:
-            play_amts[song_hash] += 1
+    # play amount dict
+    play_amts: dict[str, int] = generate_play_amounts()
     
     for song_hash, play_amt in play_amts.items():
         constraint_list[play_amt].songs.add(song_hash)
@@ -138,6 +132,28 @@ def generate_tour_constraints(db: db_type) -> list[Constraint]:
             constraint_dict[tour_name].songs.add(song_hash)
     print(f"{tourless_set_count} sets played without a tour assigned")
     return [c for _, c in constraint_dict.items() if c.value not in ("No Tour Assigned")]
+
+
+def generate_play_amt_range_constraints(db: db_type) -> list[Constraint]:
+    c_type = ConstraintType.PLAY_AMT_RANGE
+    
+    play_amt_arr = [0, 10, 20, 50, 100, 200, 300, 400, 1000, 999999]
+    def play_amt_range_str(idx: int) -> str:
+        lower_bound = play_amt_arr[idx - 1]
+        upper_bound = play_amt_arr[idx]
+        if idx - 1 == 0:
+            return f"less than {upper_bound}"
+        if idx == len(play_amt_arr) - 1:
+            return f"more than {lower_bound}"
+        return f"between {lower_bound} and {upper_bound}"
+        
+    constraint_list = [Constraint(c_type, play_amt_range_str(i)) for i in range(1, len(play_amt_arr))]
+    play_amts: dict[str, int] = generate_play_amounts()
+    
+    for song_hash, amt in play_amts.items():
+        truncated_arr = [amt_ for amt_ in play_amt_arr if amt_ < amt]
+        constraint_list[len(truncated_arr) - 1].songs.add(song_hash)
+    return constraint_list
 
 if __name__ == "__main__":
     main()

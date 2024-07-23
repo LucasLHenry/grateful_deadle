@@ -22,3 +22,11 @@ def get_hash_from_songname(songname: str, db: db_type = _DB) -> str:
     for hash, _songname in db["songs"].items():
         if _songname.lower() == songname.lower(): return hash
     raise ValueError("songname not in list")
+
+def generate_play_amounts(db: db_type = _DB) -> dict[str, int]:
+    play_amts: dict[str, int] = {}
+    for _, setlist in db["sets"].items():
+        for song_hash in setlist["songs"]:
+            play_amts.setdefault(song_hash, 0)
+            play_amts[song_hash] += 1
+    return play_amts

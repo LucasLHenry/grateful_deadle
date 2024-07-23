@@ -39,6 +39,7 @@ class ConstraintType(Enum):
     DEBUT = auto()
     TOUR = auto()
     PLAY_AMT = auto()
+    PLAY_AMT_RANGE = auto()
     
 
 
@@ -62,6 +63,8 @@ class Constraint:
                 return f"Played exactly {self.value} times"
             case ConstraintType.PLAYED_AT:
                 return f"Played at {self.value}"
+            case ConstraintType.PLAY_AMT_RANGE:
+                return f"Played {self.value} times"
     
     def gen_constraint_hash(c_type: int, value: str):
         return gen_hash(str(c_type) + value, 10)
