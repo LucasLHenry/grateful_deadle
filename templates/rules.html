@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{% block title %}Rules{% endblock %}</h1>
+<p class="text-justify text-wrap">
+    Select a square, then enter the name of a grateful dead song. If the song satisfies both the
+    constraints that apply to that square (the constraint above as well as the constraint to the left),
+    the song is correct and will turn green. If it is incorrect, it will turn red.
+</p>
+<p class="text-justify text-wrap">
+    You can only use each song name once, so sometimes you will accidentally use all the possibilities
+    for a certain square in other squares. If this happens, the square will become gray and cannot be
+    modified until one of the other squares has it's entry removed.
+</p>
+{% endblock %}

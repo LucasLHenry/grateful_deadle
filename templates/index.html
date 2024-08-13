@@ -1,10 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>The Grateful Grid</title>
-</head>
-<body>
-    <h1>The Greadful Grid</h1>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} The Grateful Grid {% endblock %}</h1>
+<datalist id="song_list">
+    {% for song_name in autocomplete_list %}
+        <option>{{song_name}}</option>
+    {% endfor %}
+</datalist>
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <button>Restart</button>
+        </div>
+        <div class="col-sm">
+            <span id="c00">Constraint 00</span>
+        </div>
+        <div class="col-sm">
+            <span id="c01">Constraint 01</span>
+        </div>
+        <div class="col-sm">
+            <span id="c02">Constraint 02</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <span id="c10">Constraint 10</span>
+        </div>
+        {% with tile_id="t00" %}
+            {% include "grid_tile.html" %}
+        {% endwith %}
+        {% with tile_id="t01" %}
+            {% include "grid_tile.html" %}
+        {% endwith %}
+        {% with tile_id="t02" %}
+            {% include "grid_tile.html" %}
+        {% endwith %}
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <span id="c11">Constraint 11</span>
+        </div>
+        {% with tile_id="t10" %}
+            {% include "grid_tile.html" %}
+        {% endwith %}
+        {% with tile_id="t11" %}
+            {% include "grid_tile.html" %}
+        {% endwith %}
+        {% with tile_id="t12" %}
+            {% include "grid_tile.html" %}
+        {% endwith %}
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <span id="c12">Constraint 12</span>
+        </div>
+        {% with tile_id="t20" %}
+            {% include "grid_tile.html" %}
+        {% endwith %}
+        {% with tile_id="t21" %}
+            {% include "grid_tile.html" %}
+        {% endwith %}
+        {% with tile_id="t22" %}
+            {% include "grid_tile.html" %}
+        {% endwith %}
+    </div>
+</div>
+<script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
+<script type="text/javascript">
+    initialize({{constraints|tojson}});
+</script>
+{% endblock %}
