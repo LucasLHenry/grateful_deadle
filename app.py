@@ -11,7 +11,7 @@ app.config["SECRET_KEY"] = "jerry-garcia"
 global_game = None
 db = get_db()
 
-@app.route('/', methods=["POST", "GET"])
+@app.route('/', methods=["GET"])
 def index():
     if request.method == "GET":
         global global_game
@@ -22,6 +22,12 @@ def index():
                 constraints=constraints_displays, 
                 autocomplete_list=all_song_names
                 ), 200
+
+@app.route('/submit', methods=["POST"])
+def submit():
+    if request.method == "POST":
+        ...
+        
     
 @app.route('/rules')
 def rules_page():
