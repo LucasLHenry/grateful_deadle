@@ -1,7 +1,7 @@
 from CONFIG import RAW_DB_FILENAME, DB_FILENAME, ROOT_DIR
 import json, io
 from datetime import date
-from lib.utils import gen_hash, parse_date_str
+from lib.database.utils import gen_hash, parse_date_str
 
 def main():
     with io.open(f"{ROOT_DIR}/lib/database/{RAW_DB_FILENAME.lower()}", mode='r', encoding='utf-8') as f:

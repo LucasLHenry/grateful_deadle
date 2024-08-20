@@ -1,6 +1,6 @@
 from game_algorithm import generate_game
-from lib.utils import run_with_timeout, calc_game_difficulty
-from lib.database.db_utils import generate_play_amounts
+from lib.database.utils import run_with_timeout, calc_game_difficulty
+from lib.database.utils import generate_play_amounts
 from math import sqrt
 import matplotlib.pyplot as plt
 

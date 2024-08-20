@@ -1,7 +1,12 @@
 from lib.classes import Constraint, ConstraintType
-from lib.database.db_utils import db_type, generate_play_amounts
-from lib.utils import parse_date_str, truncate_str
-import io, json
+from lib.database.utils import (
+    db_type, 
+    generate_play_amounts,
+    parse_date_str,
+    truncate_str, 
+    get_venue_string
+)
+import io, json, re
 from CONFIG import ROOT_DIR, DB_FILENAME, CONSTRAINTS_FILENAME
 from datetime import date
 
@@ -63,9 +68,11 @@ def generate_date_constraints(db: db_type) -> list[Constraint]:
     c_type = ConstraintType.DATE
     
     constraint_list = []
-    for date_str, val in db["sets"].items():
-        c = Constraint(c_type, date_str)
-        for song in val["songs"]:
+    for date_str, setlist in db["sets"].items():
+        venue_str = get_venue_string(setlist["venue_id"])
+        date_str_pretty = parse_date_str(date_str).strftime("%b %d, %Y")
+        c = Constraint(c_type, f"{date_str_pretty} at {venue_str}")
+        for song in setlist["songs"]:
             c.songs.add(song)
         constraint_list.append(c)
     return constraint_list
@@ -80,7 +87,9 @@ def generate_debut_constraints(db: db_type) -> list[Constraint]:
     constraint_list = []
     seen_song_hashes = set()
     for setlist in sorted_setlists:
-        c = Constraint(c_type, setlist["date"])
+        venue_str = get_venue_string(setlist["venue_id"])
+        date_str_pretty = parse_date_str(setlist["date"]).strftime("%b %d, %Y")
+        c = Constraint(c_type, f"{date_str_pretty} at {venue_str}")
         for song_hash in setlist["songs"]:
             if song_hash not in seen_song_hashes:
                 c.songs.add(song_hash)
@@ -111,9 +120,7 @@ def generate_played_at_constraints(db: db_type) -> list[Constraint]:
     constraint_dict: dict[str, Constraint] = {}
     for _, setlist in db["sets"].items():
         venue_hash = setlist["venue_id"]
-        venue_name = truncate_str(db["venues"][venue_hash]["name"], 25)
-        city_name = db["venues"][venue_hash]["city"]
-        constraint_dict.setdefault(venue_hash, Constraint(c_type, f"{venue_name}, {city_name}"))
+        constraint_dict.setdefault(venue_hash, Constraint(c_type, get_venue_string(venue_hash)))
         for song_hash in setlist["songs"]:
             constraint_dict[setlist["venue_id"]].songs.add(song_hash)
         
@@ -154,6 +161,11 @@ def generate_play_amt_range_constraints(db: db_type) -> list[Constraint]:
         truncated_arr = [amt_ for amt_ in play_amt_arr if amt_ < amt]
         constraint_list[len(truncated_arr) - 1].songs.add(song_hash)
     return constraint_list
+
+def generate_play_amt_during_tour_constraints(db: db_type) -> list[Constraint]:
+    c_type = ConstraintType.PLAY_AMT_TOUR
+    
+    
 
 if __name__ == "__main__":
     main()

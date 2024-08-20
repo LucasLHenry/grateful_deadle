@@ -1,7 +1,7 @@
 from lib.classes import Constraint, Game
 from typing import Optional
 from constraints import load_constraints  
-from lib.utils import weighted_shuffle, generate_constraint_type_weights
+from lib.database.utils import weighted_shuffle, generate_constraint_type_weights
 
 _ALL_CONSTRAINTS: list[Constraint]|None = None
 _CONSTRAINT_WEIGHTS: dict[Constraint, int]|None = None

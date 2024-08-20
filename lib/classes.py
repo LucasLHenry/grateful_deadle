@@ -2,8 +2,8 @@ from datetime import date
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional, Callable, TypeVar
-from lib.utils import gen_hash, parse_date_str, wrap
-from lib.database.db_utils import (
+from lib.database.utils import gen_hash, parse_date_str, wrap
+from lib.database.utils import (
     get_songname_from_hash, 
     get_hash_from_songname,
     db_type
@@ -40,6 +40,7 @@ class ConstraintType(Enum):
     TOUR = auto()
     PLAY_AMT = auto()
     PLAY_AMT_RANGE = auto()
+    PLAY_AMT_TOUR = auto()
     
 
 
@@ -53,17 +54,22 @@ class Constraint:
     def __str__(self) -> str:
         match self.constraint_type:
             case ConstraintType.DATE:
-                # id is the tour date
-                return f"Performed on {parse_date_str(self.value).strftime("%b %d, %Y")}"
+                # id is "date at venue"
+                return f"Performed on {self.value}"
             case ConstraintType.DEBUT:
-                return f"Debuted on {parse_date_str(self.value).strftime("%b %d, %Y")}"
+                # id is "date at venue"
+                return f"Debuted on {self.value}"
             case ConstraintType.TOUR:
-                return f"Played during the {self.value} tour"
+                # id is tour
+                return f"Played during {self.value}"
             case ConstraintType.PLAY_AMT:
+                # id is number
                 return f"Played exactly {self.value} times"
             case ConstraintType.PLAYED_AT:
+                # id is venue
                 return f"Played at {self.value}"
             case ConstraintType.PLAY_AMT_RANGE:
+                # id is "number to number"
                 return f"Played {self.value} times"
     
     def gen_constraint_hash(c_type: int, value: str):

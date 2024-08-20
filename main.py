@@ -8,10 +8,10 @@ from lib.classes import (
     GridSquare,
     CORRECT
 )
-from lib.utils import calc_game_difficulty, run_with_timeout
+from lib.database.utils import calc_game_difficulty, run_with_timeout
 from game_algorithm import generate_game
 import lib.stylesheets as ss
-from lib.database.db_utils import get_hash_from_songname, get_db
+from lib.database.utils import get_hash_from_songname, get_db
 from CONFIG import DEBUG, PB_WRAP_LEN, GAME_GENERATION_TIMEOUT_S
 
 from PyQt5 import QtWidgets, QtCore
@@ -165,6 +165,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def _show_error_window(self, text: str):
         self._ew = ErrorWindow()
         self._ew.label.setText(text)
+        self._ew.setWindowTitle("—")
         self._ew.callback.connect(partial(self.setDisabled, False))
         self._ew.show()
         self.setDisabled(True)
