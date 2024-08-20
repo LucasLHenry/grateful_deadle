@@ -127,6 +127,17 @@ class Game:
         if problem.getSolution() is None:
             return False
         
+        # each constraint combo must actually constrain that tile (less possibilities than either of them)
+        for i in range(3):
+            for j in range(3):
+                if self.top_constraints[i] is None: continue
+                if self.side_constraints[j] is None: continue
+                tile_possibilities = len(self.possibilities_at(i, j))
+                if tile_possibilities == len(self.top_constraints[i].songs):
+                    return False
+                if tile_possibilities == len(self.side_constraints[j].songs):
+                    return False
+        
         return True
                 
     def __str__(self) -> str:
