@@ -30,7 +30,6 @@ def main():  # generates constraints list
     parsed_dict = dict()
     add_constraints_to_out_dict_and_print(filter_constraints(generate_date_constraints(db)),           parsed_dict)
     add_constraints_to_out_dict_and_print(filter_constraints(generate_debut_constraints(db)),          parsed_dict)
-    add_constraints_to_out_dict_and_print(filter_constraints(generate_play_amt_constraints(db)),       parsed_dict)
     add_constraints_to_out_dict_and_print(filter_constraints(generate_played_at_constraints(db)),      parsed_dict)
     add_constraints_to_out_dict_and_print(filter_constraints(generate_tour_constraints(db)),           parsed_dict)
     add_constraints_to_out_dict_and_print(filter_constraints(generate_play_amt_range_constraints(db)), parsed_dict)
@@ -96,21 +95,6 @@ def generate_debut_constraints(db: db_type) -> list[Constraint]:
                 seen_song_hashes.add(song_hash)
         if not len(c.songs) == 0:
             constraint_list.append(c)
-    
-    return constraint_list
-
-def generate_play_amt_constraints(db: db_type) -> list[Constraint]:
-    c_type = ConstraintType.PLAY_AMT
-    
-    # all possible constraints of this type. there will be significantly less than this,
-    # will be filtered out
-    constraint_list: list[Constraint] = [Constraint(c_type, str(i + 1)) for i in range(len(db["sets"]))]
-    
-    # play amount dict
-    play_amts: dict[str, int] = generate_play_amounts()
-    
-    for song_hash, play_amt in play_amts.items():
-        constraint_list[play_amt].songs.add(song_hash)
     
     return constraint_list
 
