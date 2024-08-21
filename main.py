@@ -6,6 +6,7 @@ from lib.classes import (
     SubmitWindowInfo, 
     SubmitType, 
     GridSquare,
+    ConstraintDisplay,
     CORRECT
 )
 from lib.database.utils import calc_game_difficulty, run_with_timeout
@@ -33,10 +34,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 buf.append(GridSquare((i, j), getattr(self, f"r{i+1}c{j+1}_pb"), PB_WRAP_LEN, self._db))
             self.grid_buttons.append(buf)
         
-        self.grid_displays: list[list[QtWidgets.QLabel]] = [
-            [self.col_1_l, self.col_2_l, self.col_3_l],
-            [self.row_1_l, self.row_2_l, self.row_3_l]
-        ]
+        self.grid_displays: list[list[ConstraintDisplay]] = []
+        for pos in ["col", "row"]:
+            buf = []
+            for i in range(3):
+                buf.append(ConstraintDisplay(getattr(self, f"{pos}_{i+1}_l")))
+            self.grid_displays.append(buf)
         
         self._used_song_hashes: set[str] = set()
         
@@ -97,12 +100,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setDisabled(True)
     
     def _display_constraints(self):
-        for top_display, top_constraint in zip(self.grid_displays[0], self._game.top_constraints):
-            top_display.setText(str(top_constraint))
-            top_display.setWordWrap(True)
-        for side_display, side_constraint in zip(self.grid_displays[1], self._game.side_constraints):
-            side_display.setText(str(side_constraint))
-            side_display.setWordWrap(True)
+        for constraint_row in self.grid_displays:
+            for c in constraint_row:
+                c.show_text()
                 
     def _set_styles_to_default(self):
         for button_list in self.grid_buttons:
@@ -111,8 +111,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
         for display_list in self.grid_displays:
             for display in display_list:
-                display.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-                display.setStyleSheet(ss.display_ss)
+                display.style()
         
         self.restart_pb.setStyleSheet(ss.restart_button_ss)
     
@@ -157,10 +156,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self._used_song_hashes = set()
         if DEBUG: 
             self._game.print_all_info(self._db)
-            calc_game_difficulty(self._game)
         for i in range(3):
             for j in range(3):
                 self.grid_buttons[i][j].possibilities = self._game.possibilities_at(i, j)
+        for i, c in enumerate(self.grid_displays[0]):
+            c.constraint = self._game.side_constraints[i]
+            c.connect_clicked_callback(self._show_error_window)
+        for i, c in enumerate(self.grid_displays[1]):
+            c.constraint = self._game.top_constraints[i]
+            c.connect_clicked_callback(self._show_error_window)
 
     def _show_error_window(self, text: str):
         self._ew = ErrorWindow()

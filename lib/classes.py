@@ -11,7 +11,7 @@ from lib.database.utils import (
 from CONFIG import MINIMUM_SOLUTION_POSSIBILITES
 import constraint as csp
 from PyQt5.QtCore import pyqtSignal
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 import threading as tr
 from time import perf_counter
 import lib.stylesheets as ss
@@ -38,9 +38,9 @@ class ConstraintType(Enum):
     PLAYED_AT = auto()
     DEBUT = auto()
     TOUR = auto()
-    PLAY_AMT = auto()
     PLAY_AMT_RANGE = auto()
     PLAY_AMT_TOUR = auto()
+    SPECIAL_SHOW = auto()
     
 
 
@@ -62,10 +62,7 @@ class Constraint:
             case ConstraintType.TOUR:
                 # id is tour
                 return f"Played during {self.value}"
-            case ConstraintType.PLAY_AMT:
-                # id is number
-                return f"Played exactly {self.value} times"
-            case ConstraintType.PLAYED_AT:
+            case ConstraintType.PLAYED_AT | ConstraintType.SPECIAL_SHOW:
                 # id is venue
                 return f"Played at {self.value}"
             case ConstraintType.PLAY_AMT_RANGE:
@@ -91,6 +88,47 @@ class Constraint:
             out.songs.add(song)
         return out
     
+    def details(self) -> str:
+        match self.constraint_type:
+            case ConstraintType.DATE:
+                return """
+                This song must have been played by the Grateful Dead during their show on the given date.
+                """
+            case ConstraintType.DEBUT:
+                return """
+                This song must have been first played by the Grateful Dead during their show on the given date.
+                """
+            case ConstraintType.TOUR:
+                return """
+                This song must have been played by the Grateful Dead at some point during the given tour.
+                """
+            case ConstraintType.PLAYED_AT | ConstraintType.SPECIAL_SHOW:
+                return """
+                This song must have been played by the Grateful Dead at some point during their careers
+                at the given venue.
+                """
+            case ConstraintType.PLAY_AMT_RANGE:
+                return """
+                Over the course of their career, the Grateful Dead must have played this song an amount
+                of times in the given range.
+                """
+
+
+class ConstraintDisplay():
+    def __init__(self, qt_object: QtWidgets.QPushButton):
+        self._obj = qt_object
+        self.constraint: Constraint | None = None
+    
+    def connect_clicked_callback(self, callback_fn: Callable):
+        if self.constraint is None: raise ValueError("must set constraint first")
+        self._obj.clicked.connect(partial(callback_fn, self.constraint.details()))
+    
+    def show_text(self):
+        if self.constraint is None: raise ValueError("must set constraint first")
+        self._obj.setText(wrap(str(self.constraint), 15))
+    
+    def style(self):
+        self._obj.setStyleSheet(ss.display_ss)
 
 class Game:
     def __init__(self):
