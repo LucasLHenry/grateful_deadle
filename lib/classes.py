@@ -91,27 +91,28 @@ class Constraint:
     def details(self) -> str:
         match self.constraint_type:
             case ConstraintType.DATE:
-                return """
+                out =  """
                 This song must have been played by the Grateful Dead during their show on the given date.
                 """
             case ConstraintType.DEBUT:
-                return """
+                out =  """
                 This song must have been first played by the Grateful Dead during their show on the given date.
                 """
             case ConstraintType.TOUR:
-                return """
+                out =  """
                 This song must have been played by the Grateful Dead at some point during the given tour.
                 """
             case ConstraintType.PLAYED_AT | ConstraintType.SPECIAL_SHOW:
-                return """
+                out =  """
                 This song must have been played by the Grateful Dead at some point during their careers
                 at the given venue.
                 """
             case ConstraintType.PLAY_AMT_RANGE:
-                return """
+                out =  """
                 Over the course of their career, the Grateful Dead must have played this song an amount
                 of times in the given range.
                 """
+        return out.strip().replace('\n', '')
 
 
 class ConstraintDisplay():
