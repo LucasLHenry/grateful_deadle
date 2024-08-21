@@ -89,6 +89,8 @@ def main():
         set_dict["venue_id"] = gen_hash(venue, 6)
         
         tour_name: str = setlist["tour"]["name"]
+        if tour_name.startswith("Winter/Spring"):
+            tour_name = tour_name[7:]
         set_dict["tour"] = tour_name
         
         set_dict["songs"] = []

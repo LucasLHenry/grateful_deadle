@@ -1,6 +1,6 @@
 from CONFIG import ROOT_DIR, DB_FILENAME
 import json, io
-from typing import TypeAlias
+from typing import TypeAlias, Literal
 from datetime import date, datetime
 import hashlib, textwrap
 from typing import Iterable, Callable, TypeVar
@@ -60,7 +60,7 @@ def gen_hash(s: str, len: int) -> str:
     return hashlib.sha256(s.encode('utf-8')).hexdigest()[:len]
 
 def parse_date_str(date_str: str) -> date:
-    return datetime.strptime(date_str, "%d-%m-%Y")
+    return datetime.strptime(date_str, "%d-%m-%Y").date()
 
 def truncate_str(s: str, max_len: int):
     if len(s) > max_len:
@@ -125,3 +125,13 @@ def generate_constraint_type_weights(constraint_list):
         c_amt_dict[c.constraint_type] += 1
     max_amt = max([amt for _, amt in c_amt_dict.items()])
     return {k: max_amt / float(v) for k,v in c_amt_dict.items()}
+
+def get_season(time: date) -> Literal["Spring", "Summer", "Winter", "Fall"]:
+    Y = 2000
+    seasons = [("Winter", (date(Y,  1,  1), date(Y,  3, 20))),
+               ("Spring", (date(Y,  3, 21), date(Y,  6, 20))),
+               ("Summer", (date(Y,  6, 21), date(Y,  9, 22))),
+               ("Fall",   (date(Y,  9, 23), date(Y, 12, 20))),
+               ("Winter", (date(Y, 12, 21), date(Y, 12, 31)))]
+    time = time.replace(year=Y)
+    return next(season for season, (start, end) in seasons if start <= time <= end)

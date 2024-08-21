@@ -4,7 +4,8 @@ from lib.database.utils import (
     generate_play_amounts,
     parse_date_str,
     truncate_str, 
-    get_venue_string
+    get_venue_string,
+    get_season
 )
 import io, json, re
 from CONFIG import ROOT_DIR, DB_FILENAME, CONSTRAINTS_FILENAME
@@ -33,7 +34,8 @@ def main():  # generates constraints list
     add_constraints_to_out_dict_and_print(filter_constraints(generate_played_at_constraints(db)),      parsed_dict)
     add_constraints_to_out_dict_and_print(filter_constraints(generate_tour_constraints(db)),           parsed_dict)
     add_constraints_to_out_dict_and_print(filter_constraints(generate_play_amt_range_constraints(db)), parsed_dict)
-    
+    add_constraints_to_out_dict_and_print(filter_constraints(generate_special_show_constraints(db)),   parsed_dict)
+
     with io.open(f"{ROOT_DIR}/lib/database/{CONSTRAINTS_FILENAME.lower()}", mode='w', encoding='utf-8') as f:
         json.dump(parsed_dict, f, ensure_ascii=False, indent=4)
 
@@ -68,8 +70,8 @@ def generate_date_constraints(db: db_type) -> list[Constraint]:
     
     constraint_list = []
     for date_str, setlist in db["sets"].items():
-        venue_str = get_venue_string(setlist["venue_id"])
         date_str_pretty = parse_date_str(date_str).strftime("%b %d, %Y")
+        venue_str = get_venue_string(setlist["venue_id"])        
         c = Constraint(c_type, f"{date_str_pretty} at {venue_str}")
         for song in setlist["songs"]:
             c.songs.add(song)
@@ -113,15 +115,17 @@ def generate_played_at_constraints(db: db_type) -> list[Constraint]:
 def generate_tour_constraints(db: db_type) -> list[Constraint]:
     c_type = ConstraintType.TOUR
     
-    tourless_set_count = 0
     constraint_dict: dict[str, Constraint] = {}
-    for _, setlist in db["sets"].items():
+    for date_str, setlist in db["sets"].items():
         tour_name = setlist["tour"]
-        if tour_name == "No Tour Assigned": tourless_set_count += 1
+        if tour_name == "No Tour Assigned":
+            date_date = parse_date_str(date_str)
+            season_str = get_season(date_date)
+            tour_name = f"{season_str} Tour {date_date.year}"
         constraint_dict.setdefault(tour_name, Constraint(c_type, f"{tour_name}"))
         for song_hash in setlist["songs"]:
             constraint_dict[tour_name].songs.add(song_hash)
-    print(f"{tourless_set_count} sets played without a tour assigned")
+    
     return [c for _, c in constraint_dict.items() if c.value not in ("No Tour Assigned")]
 
 
@@ -146,8 +150,25 @@ def generate_play_amt_range_constraints(db: db_type) -> list[Constraint]:
         constraint_list[len(truncated_arr) - 1].songs.add(song_hash)
     return constraint_list
 
-def generate_play_amt_during_tour_constraints(db: db_type) -> list[Constraint]:
-    c_type = ConstraintType.PLAY_AMT_TOUR
+def generate_special_show_constraints(db: db_type) -> list[Constraint]:
+    c_type = ConstraintType.SPECIAL_SHOW
+    
+    constraint_list = []
+    for date_str, setlist in db["sets"].items():
+        match date_str:
+            case "16-08-1969":
+                c = Constraint(c_type, "Woodstock")
+            case "28-07-1973":
+                c = Constraint(c_type, "Watkins Glen")
+            case "01-07-1970":
+                c = Constraint(c_type, "Festival Express")
+            case _:
+                continue
+        
+        for song in setlist["songs"]:
+            c.songs.add(song)
+        constraint_list.append(c)
+    return constraint_list
     
     
 
